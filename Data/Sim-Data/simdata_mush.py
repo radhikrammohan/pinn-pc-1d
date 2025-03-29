@@ -150,7 +150,7 @@ class HT_sim():
         for m in range(1, self.num_steps+1):                                                                            # time loop
             
             
-            htc = 10.0                   # htc of Still air in W/m^2-K
+            htc = self.htc                  # htc of Still air in W/m^2-K
             q1 = htc*(temp_int[0]-self.t_surr)   # Heat flux at the left boundary
     
             # print(f"q1 is {q1}")
