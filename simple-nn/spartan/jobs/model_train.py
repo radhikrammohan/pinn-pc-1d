@@ -130,18 +130,57 @@ optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)
 # %%
 loss_train,loss_test,best_model = training_loop(epochs,model,optimizer,train_loader,val_loader)
 
-# %%
-# Save the best model
+def move_to_cpu(obj):
+    """Recursively move tensors in a dictionary or list to CPU."""
+    if isinstance(obj, torch.Tensor):
+        return obj.cpu()
+    elif isinstance(obj, list):
+        return [move_to_cpu(item) for item in obj]  # Convert tensors inside lists
+    elif isinstance(obj, dict):
+        return {k: move_to_cpu(v) for k, v in obj.items()}  # Convert tensors inside dicts
+    return obj  # Return unchanged for other types
 
-model_path = '../tr-models/best_model.pth'
-torch.save(best_model.state_dict(), model_path)
-print(f"Model saved to {model_path}")
+# Ensure all tensors inside lists/dicts are on CPU
+loss_train = move_to_cpu(loss_train)
+loss_test = move_to_cpu(loss_test)
 
-#save the loss values
-loss_path = '../tr-models/loss_values.pkl'
-with open(loss_path, 'wb') as f:
-    pickle.dump((loss_train, loss_test), f)
-print(f"Loss values saved to {loss_path}")
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--job_id", type=str, default="000000")
+args = parser.parse_args()
+
+# Create a unique folder based on SLURM job ID
+
+# Create a unique folder based on SLURM job ID
+
+folder_path = f"model-files/job_{args.job_id}/"
+os.makedirs(folder_path, exist_ok=True)
+
+torch.save(best_model.state_dict(),os.path.join(folder_path, "best-model.pth"))
+
+# Define file path
+loss_train_pth = os.path.join(folder_path, "train-loss.pkl")
+loss_test_pth = os.path.join(folder_path, "test-loss.pkl")
+
+
+# Save file in the specified folder
+with open(loss_train_pth, "wb") as f:
+    pickle.dump(loss_train, f)
+
+with open(loss_test_pth, "wb") as f:
+    pickle.dump(loss_test, f)
+
+
+
+print(f"File saved at: {loss_train_pth}")
+print(f"File saved at: {loss_test_pth}")
+
+print("Training complete")
+print(f"Model Architecture: {hidden_size} x {hidden_layers+1}, Learning Rate: {learning_rate},Activation: Tanh, Optimizer: Adam")
+
+
+
 
 
 # %%
