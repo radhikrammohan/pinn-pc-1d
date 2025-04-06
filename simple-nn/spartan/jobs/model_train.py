@@ -65,8 +65,13 @@ for col in cols:
     temp3[col] = scaler.fit_transform(temp3[[col]])
     scalers[col] = scaler
 
+# Parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("--job_id", type=str, default="000000")
+args = parser.parse_args()
+
 # Save the scalers to a file
-scaler_file = '../tr-models/scalers.pkl'
+scaler_file = f'model-files/job_{args.job_id}/scalers.pkl'
 with open(scaler_file, 'wb') as f:
     pickle.dump(scalers, f)
     
@@ -143,9 +148,7 @@ loss_test = move_to_cpu(loss_test)
 
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--job_id", type=str, default="000000")
-args = parser.parse_args()
+
 
 # Create a unique folder based on SLURM job ID
 

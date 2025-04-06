@@ -14,7 +14,7 @@
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
 
 module load python
-source pinn-1d/bin/activate
+source ../../../pinn-1d/bin/activate
 
 
 python model_train.py --job_id $SLURM_JOB_ID 
