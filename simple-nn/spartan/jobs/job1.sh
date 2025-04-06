@@ -14,9 +14,9 @@
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
 
 module load python
-source pinn2/bin/activate
+source pinn-1d/bin/activate
 
-echo " settings_peter_geo+mat simulation with job id $SLURM_JOB_ID"
-python main_peter_geo_mat_3.py
+
+python model_train.py
 
 
