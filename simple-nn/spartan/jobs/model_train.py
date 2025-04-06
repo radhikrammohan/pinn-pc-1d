@@ -118,7 +118,7 @@ output_size = 1
 learning_rate = 0.005
 hidden_layers = 5
 
-epochs= 1
+epochs= 2000
 
 model = SimpleNN(input_size,hidden_size,output_size,hidden_layers)
 optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)
