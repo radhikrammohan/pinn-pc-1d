@@ -182,8 +182,7 @@ class HT_sim():
                     
                 else:  # Invalid temperature range
                     raise ValueError(f"Temperature {tempfield[n]} at index {n} is out of bounds.")
-                
-                                                                            # Update temperature
+                                                                      # Update temperature
             temp_int = tempfield.copy()                                                                  # Update last time step temperature
             self.temphist.append(tempfield.copy())                                                  # Append the temperature history to add ghost points
                                             # Store midpoint temperature
@@ -197,8 +196,7 @@ class HT_sim():
         x = np.linspace(0, self.length, self.num_points)
         t = np.linspace(0, self.time_end, self.num_steps+1)
         X, T = np.meshgrid(x, t)
-        
-        return X, T
+        return X, T 
     
     def plot_temp(self,idx):
         # Plot the temperature distribution over time at the midpoint
@@ -288,13 +286,14 @@ def pdeinp(x_min, x_max, t_min, t_max, n_samples, sampler, scl="True"):
     elif sampler == "Sobol":
         inp_pde = quasirandom(n_samples, "Sobol", x_min, x_max, t_min, t_max)
     else:
-        raise ValueError("Invalid sampler specified. Choose from 'random', 'uniform', 'LHS', 'Halton', 'Hammersley', 'Sobol'.")
+        raise ValueError("Invalid sampler specified. Choose from 'random',\
+            'uniform', 'LHS', 'Halton', 'Hammersley', 'Sobol'.")
     if scl=="True":
         print("scaling initated")
         inp_pde[:,0] = scaler(inp_pde[:,0], x_min, x_max)
         inp_pde[:,1] = scaler(inp_pde[:,1], t_min, t_max)
     else:
-        print("scaling not initiated") 
+        print("scaling not initiated")
     print("The number of points in the PDE input is", len(inp_pde))
     return inp_pde
 
@@ -345,4 +344,3 @@ def invscaler(data, min_d, max_d):
     # Inverse scaling to bring the data back to original scale
     invsc_data = data*(max_d-min_d) + min_d
     return invsc_data
-

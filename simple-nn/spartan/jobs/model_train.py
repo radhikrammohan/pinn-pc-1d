@@ -117,13 +117,13 @@ print('Using device:', device)
 
 # %%
 input_size = 3
-hidden_size = 20
+hidden_size = 10
 output_size = 1
 
 learning_rate = 0.005
 hidden_layers = 5
 
-epochs= 2000
+epochs= 3000
 
 model = SimpleNN(input_size,hidden_size,output_size,hidden_layers)
 optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)
