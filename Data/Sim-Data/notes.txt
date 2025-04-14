@@ -1,0 +1,20 @@
+# Data generation for the simulation
+
+Objectives:-
+
+1. Should depict the solidification of Casting realistically.
+2. Should be able to predict defects using Niyama Criteria.
+3. Should have clear information on the Equations used for the simulation.
+
+Case Study:-
+
+Solidification and Niyama prediction of a 1D Bar.
+
+
+1. Identify the real world cases where shrinkage is generally found
+2. In one such case , identify a 1D geometry.
+3. Get a real world scenario where we know the material, process properties and the geenrated simulation can be compared to real world.
+
+In case of casting and niyama criteria which is ration of temperature gradient in space (G) to time (R), shrinkage occurs when the G is less and R is more.
+This happens when thickenss is more and heat flows quickly. 
+
