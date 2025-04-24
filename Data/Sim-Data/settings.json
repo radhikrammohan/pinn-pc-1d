@@ -2,7 +2,7 @@
   "length": 15.0e-3,
   "time_end": 40.0,
   "num_points":50,
-  "t_surr": 500.0,
+  "t_surr": 700.0,
   "temp_init":919.0,
   "dm": 60.0e-3,
 

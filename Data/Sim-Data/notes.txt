@@ -18,3 +18,35 @@ Solidification and Niyama prediction of a 1D Bar.
 In case of casting and niyama criteria which is ration of temperature gradient in space (G) to time (R), shrinkage occurs when the G is less and R is more.
 This happens when thickenss is more and heat flows quickly. 
 
+
+Stages of data generation
+
+1. Defining the problem case
+
+    We want to simulate a case of HPDC and focus on soldification. 
+    So we consider the stage when the material has filled the die under high pressure and then soldification happens.
+         
+
+2. Defining the PDE 
+    The PDE consider is the transient heat conduction equation with the source term  embedded with the latent heat of freezing.
+    Overlead document has this PDE [Done]
+    
+
+3. Defining the IC and BC conditions [Done]
+    The initial condition is uniform temperature 
+    The boundary condition is a fixed heat flow rate at the boundaries.
+    The heat flow rate is governed by convection due to coolant flow rate at the boundaries.
+
+---think whether we can simulate a presence of metal boundary (die) at the boundary---
+
+4. Selecting referenced Material conditions [Pending]
+    The material considered here is Aluminium Alloy (---) which is generally used in NISSAN Casting
+
+5. Choosing the DOE [Pending]
+    There are material and process parameters which is investigated for influence on the shrinakge generation.
+    The material parameters are L_fusion, k, cp and Density at solid, liquid and intermediate mushy range
+    The process parameters are initial temperature, boundary heat transfer coefficients.
+    
+6. Selecting the variation range[Pending]
+
+7. Generating the Data based on DOE and storing it in a file/database.[Pending]
