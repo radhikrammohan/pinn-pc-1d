@@ -25,22 +25,26 @@ Stages of data generation
 
     We want to simulate a case of HPDC and focus on soldification. 
     So we consider the stage when the material has filled the die under high pressure and then soldification happens.
+    Here we have two die interfaces at the both ends.
          
 
 2. Defining the PDE 
     The PDE consider is the transient heat conduction equation with the source term  embedded with the latent heat of freezing.
+    The thermal conductivity,specific heat and latent heat changes with respect to temperature (Zhang et.al Paper)
+
     Overlead document has this PDE [Done]
     
+## We are using FDD because it is simple 1D, for 3D with complex shapes we will need to use FEM/FVM  methods.
 
 3. Defining the IC and BC conditions [Done]
-    The initial condition is uniform temperature 
+    The initial condition is uniform temperature and pressure.
     The boundary condition is a fixed heat flow rate at the boundaries.
     The heat flow rate is governed by convection due to coolant flow rate at the boundaries.
 
----think whether we can simulate a presence of metal boundary (die) at the boundary---
+There are two metal molds at the left and right boundaries.
 
 4. Selecting referenced Material conditions [Pending]
-    The material considered here is Aluminium Alloy (---) which is generally used in NISSAN Casting
+    The material considered here is Aluminium Alloy (A356) based on the Zhang et.al Paper.
 
 5. Choosing the DOE [Pending]
     There are material and process parameters which is investigated for influence on the shrinakge generation.
