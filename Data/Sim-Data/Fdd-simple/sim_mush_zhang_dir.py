@@ -56,10 +56,7 @@ class HT_sim():
         self.alpha_l = self.k_l / (self.rho_l * self.cp_l)
         self.alpha_s = self.k_s / (self.rho_s*self.cp_s)
         self.alpha_m = self.k_m / (self.rho_m * self.cp_m)          #`Thermal diffusivity in mushy zone is taken as average of liquid and solid thermal diffusivity`
-        # print(self.alpha_m, self.alpha_l, self.alpha_s)
-        # self.L_fusion = 389.0e3               # J/kg  # Latent heat of fusion of aluminum
-        # self.T_L = 574.4 +273.0                       #  K -Liquidus Temperature (615 c) AL 380
-        # self.T_S = 497.3 +273.0                     # K- Solidus Temperature (550 C)
+        
         self.m_eff =(self.k_m/(self.rho_m*(self.cp_m + (self.L_fusion/(self.T_L-self.T_S)))))
 
         # sim field generation
@@ -155,7 +152,11 @@ class HT_sim():
             for n in range(1,self.num_points-1):              # space loop, adjusted range
                 
                 if tempfield[n] > self.T_L:  # Liquid phase
-                    tempfield[n] += ((self.alpha_l * self.step_coeff) * (temp_int[n+1] \
+                    k_l = self.model_k.predict([[tempfield[n]]]) # include the model for k from Zhang
+                    cp_l = self.model_cp.predict([[tempfield[n]]]) # include the model for cp from Zhang
+                    rho_l = self.rho_l
+                    alpha_l = k_l / (rho_l * cp_l) # include the model for alpha from Zhang
+                    tempfield[n] += ((alpha_l * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))
                     
                 elif self.T_L >= tempfield[n] > self.T_S:  # Mushy phase
@@ -163,13 +164,17 @@ class HT_sim():
                     k_m = self.model_k.predict([[tempfield[n]]]) # include the model for k from Zhang
                     cp_m = self.model_cp.predict([[tempfield[n]]]) # include the model for cp from Zhang
                     rho_m = self.rho_ramp(tempfield[n], self.rho_l, self.rho_s, self.T_L, self.T_S) #inlcude the model for rho from Zhang
-                    self.alpha_m = k_m / ((rho_m * (cp_m)) - self.latent_heat(tempfield[n]))# Figureout how the eqn cameup
+                    self.alpha_m = k_m / ((rho_m * (cp_m)) + self.latent_heat(tempfield[n]))# Figureout how the eqn cameup
                     
                     tempfield[n] += ((self.alpha_m * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))
                 
                 elif tempfield[n] <= self.T_S:  # Solid phase
-                    tempfield[n] += ((self.alpha_s * self.step_coeff) * (temp_int[n+1] \
+                    k_s = self.model_k.predict([[tempfield[n]]]) # include the model for k from Zhang
+                    cp_s = self.model_cp.predict([[tempfield[n]]]) # include the model for cp from Zhang
+                    rho_s = self.rho_s
+                    alpha_s = k_s / (rho_s * cp_s) # include the model for alpha from Zhang
+                    tempfield[n] += ((alpha_s * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))
                     
                 else:  # Invalid temperature range

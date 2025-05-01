@@ -2,31 +2,31 @@
   "length": 15.0e-3,
   "time_end": 400.0,
   "num_points":50,
-  "t_surr": 700.0,
+  "t_surr": 298.0,
   "temp_init":919.0,
   "dm": 60.0e-3,
 
-  "rho": 2300.0, 
-  "rho_s": 2710.0,
-  "rho_l": 2460.0,
+  "rho": 2369.0, 
+  "rho_s": 2600.0,
+  "rho_l": 2369.0,
 
-  "cp": 1245.3,
-  "cp_s": 963.0,
-  "cp_l": 1245.3,
+  "cp": 1180.0,
+  "cp_s": 1180.0,
+  "cp_l": 1100.0,
 
-  "k": 104.0,
-  "k_s": 96.2,
-  "k_l": 104.0,
-  "k_mo":41.5,
+  "k": 65.8,
+  "k_s": 140.0,
+  "k_l": 65.8,
+  "k_mo":26.0,
 
   "L_fusion":389.0e3,
-  "T_L":847.4,
-  "T_S": 770.3,
+  "T_L":886.0,
+  "T_S": 830.0,
 
   "htc":10.0,
 
-  "die_temp_l": 833.0,
-  "die_temp_r": 833.0,
+  "die_temp_l": 773.0,
+  "die_temp_r": 773.0,
 
   "model_k_path": "model_k.joblib",
   "model_cp_path": "model_cp.joblib"
