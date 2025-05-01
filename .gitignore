@@ -8,4 +8,4 @@ __pycache__/
 .ipynb_checkpoints/
 
 pinn-1d/
-**/heat_data.csv
+Data/Sim-Data/Fdd-simple/heat_data.csv
