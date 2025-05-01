@@ -161,11 +161,14 @@ def pde_loss(model,x,t,T_S,T_L):
    
     if mask_l.any():
         residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
+        print("Liquid phase residual calculated")
     if mask_s.any():
         residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
+        print("Solid phase residual calculated")
     if mask_m.any():
         c3 = (1+ 1/Ste(u_pred[mask_m]))
         residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m(u_pred[mask_m]) * u_xx[mask_m].view(-1) # Mushy phase
+        print("Mushy phase residual calculated")
 
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
    
@@ -216,6 +219,8 @@ def boundary_loss(model,x,t,t_surr,t_init):
     bc_cal = bc_func(x,t,t_surr,t_init)
     
     bc_mean =  torch.mean(torch.square(u_pred-bc_cal))
+    print(f"Boundary condition loss calculated: {u_pred.mean():.6f}")
+    # bc_mean =  torch.mean(torch.square(u_pred-t_surr))
     # bc_mean =  torch.mean(torch.square(u_pred-bc))
     # bc_mean = nn.MSELoss()(u_pred,bc)
    
@@ -235,6 +240,7 @@ def ic_loss(model,x,t,temp_init):
    
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))
+    print(f"Initial condition loss calculated: {u_pred.mean():.6f}")
     return ic_mean
 
 def accuracy(u_pred, u_true):

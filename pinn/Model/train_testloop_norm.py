@@ -8,7 +8,18 @@ from torch.optim import Adam
 from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
 
 
+from logger_config import setup_logger
+import random
+import time
+import csv
 
+logger =setup_logger('train_test_loop', '../logs/train_test_loop_norm.csv')
+
+with open('logs/train_test_loop.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    # Write the header row
+    writer.writerow(['epoch', 'train_loss', 'test_loss', 'data_loss', 'pde_loss', 'ic_loss', 'bc_loss',
+                     'data_loss_test', 'pde_loss_test', 'ic_loss_test', 'bc_loss_test'])
 
 # check for gpu
 if torch.backends.mps.is_available():
@@ -118,14 +129,37 @@ def training_loop(epochs, model, \
             # Define weights for the different losses
             w0, w1, w2, w3 = 1, 1, 1, 1
             # Calculate total loss
-            loss = w1 * phy_loss + w2 * init_loss + w3 * bc_loss
+            loss = data_loss 
             # loss =  w1 * phy_loss + w2 * init_loss + w3 * bc_loss
             # Backpropagation
             loss.backward(retain_graph=True)  # Backpropagate the gradients
 
             def closure():
                 optimizer.zero_grad()
-                loss.backward()
+                # Forward pass for data prediction
+                u_pred_d = model(inputs[:, 0].unsqueeze(1), inputs[:, 1].unsqueeze(1))
+                data_loss = loss_fn_data(u_pred_d, temp_inp)  # Data loss
+                
+                # Forward pass for initial condition prediction
+                u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
+                init_loss = ic_loss(model,inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1),temp_init_t)  # Initial condition loss
+                
+                # Forward pass for boundary conditions
+                u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
+                u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
+                
+                # Boundary condition loss (left and right)
+                bc_loss_left = boundary_loss(model, inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1), die_temp_l,temp_init_t)
+                bc_loss_right = boundary_loss(model, inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1), die_temp_r,temp_init_t)
+                bc_loss = 0.5*(bc_loss_left + bc_loss_right)
+                # Calculate individual losses
+                phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
+
+                # Define weights for the different losses
+                w0, w1, w2, w3 = 1, 1, 1, 1
+                # Calculate total loss
+                loss = w1 * phy_loss + w2 * init_loss + w3 * bc_loss
+                loss.backward(retain_graph=True)
                 return loss
             
             if optimizer.__class__ == torch.optim.Adam:
@@ -195,7 +229,7 @@ def training_loop(epochs, model, \
             phy_loss_t = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)
             
             w0, w1, w2, w3 = 1,1,1,1
-            loss_t =  w1 * phy_loss_t + w2 * init_loss_t + w3 * bc_loss_t
+            loss_t =  data_loss_t 
             # loss_t = w1 * phy_loss_t + w2 * init_loss_t + w3 * bc_loss_t
             
             test_loss += loss_t.item()
@@ -259,6 +293,10 @@ def training_loop(epochs, model, \
             print(f" ")
     # Return all collected losses for further analysis
     # return train_losses, test_losses, pde_losses, bc_losses, ic_losses, data_losses
+    
+        logger.info(f"{epoch+1}, {train_loss:.4e}, {test_loss:.4e}, {data_loss_b:.4e}, \
+            {phy_loss_acc:.4e}, {init_loss_acc:.4e}, {bc_loss_acc:.4e}, {data_loss_t:.4e}, \
+                {phy_loss_t:.4e}, {ic_loss_t:.4e}, {bc_l_loss_t:.4e}")
     return loss_train, loss_test, best_model
 
 

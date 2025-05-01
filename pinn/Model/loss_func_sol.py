@@ -17,9 +17,13 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 
-import logging
+from logger_config import setup_logger
+import random
+import time
+import csv
 
-logging.basicConfig(filename='log.txt', level=logging.INFO, filemode='w')
+
+
 
 
 if torch.backends.mps.is_available():
@@ -105,14 +109,19 @@ def l1_regularization(model, lambd):
     l1_reg = sum(param.abs().sum() for param in model.parameters())
     return l1_reg * lambd
 
-def pde_loss(model,x,t,T_S,T_L):
+
+
+
+
+def pde_loss(model,x,t,T_S,T_L,epoch):
     # u_pred.requires_grad = True
     x.requires_grad = True
     t.requires_grad = True
     
     u_pred = model(x,t).to(device)
     # u_pred  = model
-
+    
+    
     u_t = torch.autograd.grad(u_pred, t, 
                                 torch.ones_like(u_pred),
                                 create_graph=True,
@@ -164,25 +173,43 @@ def pde_loss(model,x,t,T_S,T_L):
     
     # print(f"u_t",u_t)
     # print(f"u_xx",u_xx)
-
+    
     residual = torch.zeros_like(u_pred).to(device)
 
     # print(f"alpha_l_t: {alpha_l_t.item():.6f}, alpha_s_t: {alpha_s_t.item():.6f}")
 
-    if mask_l.any():
-        residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
-        # print(f"Liquid phase: {torch.mean(residual[mask_l]).item():.6f}")
-    if mask_s.any():
-        residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
-        # print(f"Solid phase: {torch.mean(residual[mask_s]).item():.6f}")
-    if mask_m.any():
-        c3 = (1+ 1/Ste(u_pred[mask_m]))
-        residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m(u_pred[mask_m]) * u_xx[mask_m].view(-1) # Mushy phase
-        # print(alpha_m(u_pred[mask_m]))
-        # print(f"Mushy phase: {torch.mean(residual[mask_m]).item():.6f}")
+    # if mask_l.any():
+    #     residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
+    #     print(f"Liquid Phase-u_pred:{torch.mean(u_pred[mask_l]).item():.6f},Liquid phase-u_t: {torch.mean(u_t[mask_l]).item():.6f},\
+    #     Liquid phase-residual: {torch.mean(residual[mask_l]).item():.6f},\
+    #     Liquid phase-alpha_l_t: {alpha_l_t.item():.6f},\
+    #     Liquid phase-u_xx: {torch.mean(u_xx[mask_l]).item():.6f}")
 
+    # elif mask_s.any():
+    #     residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
+    #     print(f"Solid phase-u_pred: {torch.mean(u_pred[mask_s]).item():.6f}, Solid phase-u_t: {torch.mean(u_t[mask_s]).item():.6f},\
+    #           Solid phase-residual: {torch.mean(residual[mask_s]).item():.6f},\
+    #           Solid phase-alpha_s_t: {alpha_s_t.item():.6f},\
+    #           Solid phase-u_xx: {torch.mean(u_xx[mask_s]).item():.6f}")
+
+    # elif mask_m.any():
+    #     c3 = (1+ 1/Ste(u_pred[mask_m]))
+        
+    #     residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m(u_pred[mask_m]) * u_xx[mask_m].view(-1) # Mushy phase
+
+    #     print(f" Mushy u_pred: {torch.mean(u_pred[mask_m]).item():.6f}, Mushy phase-residual: {torch.mean(residual[mask_m]).item():.6f}, \
+    #             Mushy phase-c3: {c3.mean().item():.6f}, \
+    #             Mushy phase-alpha_m: {alpha_m(u_pred[mask_m]).mean().item():.6f}, \
+    #             Mushy phase-u_t: {torch.mean(u_t[mask_m]).item():.6f}, \
+    #             Mushy phase-u_xx: {torch.mean(u_xx[mask_m]).item():.6f}, \
+    #                 Mushy phase-Ste: {Ste(u_pred[mask_m]).mean().item():.6f}")
+    residual = u_t - alpha_l_t * u_xx
+    residual = u_t - alpha_s_t * u_xx
+    c3 = (1 + 1 / Ste(u_pred))
+    residual = c3 * u_t - alpha_m(u_pred) * u_xx # Mushy phase
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
-   
+    print(f"u_pred: {torch.mean(u_pred).item():.6f}, u_t: {torch.mean(u_t).item():.6f}, \
+            residual: {torch.mean(residual).item():.6f}")
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
     
