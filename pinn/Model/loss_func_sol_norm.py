@@ -55,7 +55,7 @@ cp_s_t = torch.tensor(props['cp_s'],dtype=torch.float32,device=device)
 alpha_l_t = k_l_t / (rho_l_t * cp_l_t) 
 
 alpha_s_t = k_s_t / (rho_s_t*cp_s_t)
-alpha_s_t = torch.tensor(alpha_s_t,dtype=torch.float32,device=device)
+alpha_s_t = alpha_s_t.clone().detach().to(dtype=torch.float32, device=device)
 
 # # alpha_m = k_m / (rho_m * cp_m)          #`Thermal diffusivity in mushy zone is taken as average of liquid and solid thermal diffusivity`
 
@@ -105,7 +105,7 @@ def pde_loss(model,x,t,T_S,T_L):
     
     u_pred = model(x,t).to(device)
     # u_pred  = model
-
+    print("u_pred shape:", u_pred.shape)
     u_t = torch.autograd.grad(u_pred, t, 
                                 torch.ones_like(u_pred),
                                 create_graph=True,

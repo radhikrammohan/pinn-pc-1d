@@ -304,6 +304,44 @@ def pdeinp(x_min, x_max, t_min, t_max, n_samples, sampler, scl="True"):
 
     #flatten the meshgrid and return the output
 
+def pde_act_pts(x_min, x_max, t_min, t_max, t_lim,n_samples, sampler, scl="True"):
+    #module to tailor pde poitns at more action points
+    n_dist = int(n_samples*0.8)
+    n_rem = n_samples - n_dist
+    if sampler == "random":
+        inp_pde_main = unidata(x_min, x_max, t_min, t_max, n_dist, sampler)
+        inp_pde_rem = unidata(x_min, x_max, t_min, t_lim, n_rem, sampler)
+    elif sampler == "uniform":
+        inp_pde_main = unidata(x_min, x_max, t_min, t_max, n_dist, sampler)
+        inp_pde_rem = unidata(x_min, x_max, t_min, t_lim, n_rem, sampler)
+    elif sampler == "LHS":
+        inp_pde_main = quasirandom(n_dist, "LHS", x_min, x_max, t_min, t_max)
+        inp_pde_rem = quasirandom(n_rem, "LHS", x_min, x_max, t_min, t_lim)
+    elif sampler == "Halton":
+        inp_pde_main = quasirandom(n_dist, "Halton", x_min, x_max, t_min, t_max)
+        inp_pde_rem = quasirandom(n_rem, "Halton", x_min, x_max, t_min, t_lim)
+    elif sampler == "Hammersley":
+        inp_pde_main = quasirandom(n_dist, "Hammersley", x_min, x_max, t_min, t_max)
+        inp_pde_rem = quasirandom(n_rem, "Hammersley", x_min, x_max, t_min, t_lim)
+    elif sampler == "Sobol":
+        inp_pde_main = quasirandom(n_dist, "Sobol", x_min, x_max, t_min, t_max)
+        inp_pde_rem = quasirandom(n_rem, "Sobol", x_min, x_max, t_min, t_lim)
+    else:
+        raise ValueError("Invalid sampler specified. Choose from 'random',\
+            'uniform', 'LHS', 'Halton', 'Hammersley', 'Sobol'.")
+    #Combine the main and remaining points
+    inp_pde = np.vstack((inp_pde_main, inp_pde_rem))
+    #Scale the data if required
+    
+    if scl=="True":
+        print("scaling initiated")
+        inp_pde[:,0] = scaler(inp_pde[:,0], x_min, x_max)
+        inp_pde[:,1] = scaler(inp_pde[:,1], t_min, t_max)
+    else:
+        print("scaling not initiated")
+    print("The number of points in the PDE input is", len(inp_pde))
+    return inp_pde
+    
 def icinp(length, icpts,scl="True"):
     # module to create initial condition inputs
     x = np.linspace(0, length, icpts)

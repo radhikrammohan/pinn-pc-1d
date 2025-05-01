@@ -31,7 +31,7 @@ sys.path.insert(0,str(model_dir))
  
     
 
-from training_data.simdata_mush_dirc import  fdd, pdeinp, icinp, bcinp,HT_sim ,scaler, invscaler
+from training_data.simdata_mush_dirc import  *
 from Model.loss_func_sol import loss_fn_data,pde_loss,ic_loss,boundary_loss
 from Model.train_testloop import *
 
@@ -95,6 +95,8 @@ inp_data = fdd(15e-3, time_end, numpoints, num_steps)
 # input dataset-pde residual
 # The pde inputs are generated using the pdeinp function in simdata.py
 pde_data = pdeinp(dx,length-dx,dt,time_end,pde_pts,"Sobol",scl="False") 
+t_lim = 2
+pde_data_new = pde_act_pts(dx,length-dx,dt,time_end,t_lim,pde_pts,"Sobol",scl="False") 
 
 # pde_data2 = scale2(pde_data,x_c,t_c)
 
@@ -121,7 +123,7 @@ else:
 # ### Tensor inputs
 
 input_t = torch.tensor(inp_data).float().to(device)
-inp_pdet = torch.tensor(pde_data).float().to(device)
+inp_pdet = torch.tensor(pde_data_new).float().to(device)
 inp_ict = torch.tensor(ic_data).float().to(device)
 inp_bclt = torch.tensor(bc_ldata).float().to(device)
 inp_bclr = torch.tensor(bc_rdata).float().to(device)
@@ -131,18 +133,13 @@ inp_bclr = torch.tensor(bc_rdata).float().to(device)
 temp_t = torch.tensor(temp_data).float().to(device)
 temp_t = temp_t.view(-1,1)
 
-# temp_init_s= temp_scaler(919.0, temp_init, t_surr)
-# temp_init = scaler(temp_init,500.0,919.0)
+
 temp_init = props['temp_init']                   #  K -Initial Temperature (919 c) AL 380
 temp_init_t = torch.tensor(temp_init).float().to(device)
 T_L = props['T_L']                   #  K -Liquidus Temperature (615 c) AL 380
-# T_L_s = scaler(T_L,temp_init, t_surr)                     #  K -Liquidus Temperature (615 c) AL 380
-# T_L = scaler(T_L,500.0,919.0)
+
 T_S = props['T_S']                   #  K -Solidus Temperature (615 c) AL 380
-# T_S_s = scaler(T_S,temp_init, t_surr)                     #  K -Solidus Temperature (615 c) AL 380
-# T_S = scaler(T_S,500.0,919.0)                     #  K -Solidus Temperature (615 c) AL 380
-# t_surr_s = temp_scaler(t_surr, temp_init, t_surr)
-# t_surr = scaler(t_surr,500.0,919.0)
+
 t_surr = props['t_surr']                   #  K -Surrounding Temperature (500 c) AL 380
 T_lt = torch.tensor(T_L).float().to(device)    # Liquidus Temperature tensor
 T_st = torch.tensor(T_S).float().to(device)    # Solidus Temperature tensor
