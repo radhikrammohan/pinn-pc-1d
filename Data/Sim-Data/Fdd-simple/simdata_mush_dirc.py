@@ -86,7 +86,8 @@ class HT_sim():
         self.step_coeff = self.step_coeff_calc(self.dt, self.dx)
         self.num_steps = round(self.time_end/self.dt)
 
-    
+        self.die_temp_l
+        self.die_temp_r
     
 
     def dx_calc(self,length, num_points):
@@ -155,11 +156,11 @@ class HT_sim():
     
             # print(f"q1 is {q1}")
             # tempfield[0] = temp_int[0] + self.alpha_l * self.step_coeff * ((2.0*temp_int[1]) - (2.0 * temp_int[0])-(2.0*self.dx*(q1)))  # Update boundary condition temperature
-            tempfield[0] = self.t_surr
+            tempfield[0] = self.die_temp_l
             q2 = htc*(temp_int[-1]-self.t_surr)                   # Heat flux at the right boundary
             # tempfield[-1] = temp_int[-1] + self.alpha_l * self.step_coeff * ((2.0*temp_int[-2]) - (2.0 * temp_int[-1])-(2.0*self.dx*(q2)))  # Update boundary condition temperature
     
-            tempfield[-1] = self.t_surr
+            tempfield[-1] = self.die_temp_r
             for n in range(1,self.num_points-1):              # space loop, adjusted range
                 
                 if tempfield[n] > self.T_L:  # Liquid phase

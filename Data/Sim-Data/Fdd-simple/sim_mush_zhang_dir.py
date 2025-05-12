@@ -61,11 +61,7 @@ class HT_sim():
 
         # sim field generation
         self.tempfield = np.full(self.num_points, self.temp_init)            # Initial temperature of the rod with ghost points at both ends
-                         # Initial temperature of the rod
-
-                                # Index of the midpoint
-                  # List to store temperature at midpoint over time
-                                                                   # die thickness in m
+                         
         # Calculate dx,dt, and step_coeff
         self.dx = self.dx_calc(self.length, self.num_points)
         print("The spatial step is", self.dx)
@@ -86,9 +82,11 @@ class HT_sim():
         return dx
     
     def dt_calc(self,dx, alpha_l, alpha_s, alpha_m):
-        maxi = max(alpha_s,alpha_l,alpha_m)
-        dt = abs(0.5*((dx**2) /maxi))
+        # maxi = max(alpha_s,alpha_l,alpha_m)
+        alpha_m = 400/(2369*1190)
+        dt = abs(0.5*((dx**2) /alpha_m))
         return dt
+    
     def cflcheck(self,dx, alpha_l, alpha_s, alpha_m):
         cfl = 0.5 *(dx**2/max(alpha_l,alpha_s,alpha_m))
         if cfl > 1:
@@ -114,11 +112,11 @@ class HT_sim():
         lf = np.zeros_like(t)
 
         # Apply conditions for each range
-        lf[(t >= (533.0 +273.0)) & (t < (563.6+273))] = 36.18
-        lf[(t >= (563.6+273.0)) & (t < (567.2+273))] = 170.36
-        lf[(t >= (567.2+273.0)) & (t < (588.2+273))] = 48.74
-        lf[(t >= (588.2+273.0)) & (t < (610.7+273))] = 91.20
-        lf[(t >= (610.7+273.0)) & (t < (613.2+273))] = 51.02
+        lf[(t >= (806 )) & (t < (836.6))] = 36.18e3
+        lf[(t >= (836.6)) & (t < (840.2))] = 170.36e3
+        lf[(t >= (840.2)) & (t < (861.2))] = 48.74e3
+        lf[(t >= (861.2)) & (t < (883.7))] = 91.20e3
+        lf[(t >= (883.7)) & (t < (886.2))] = 51.02e3
 
         # Return scalar if input was scalar, otherwise return array
         return lf.item() if lf.size == 1 else lf
@@ -143,8 +141,6 @@ class HT_sim():
         for m in range(1, self.num_steps+1):                                                                            # time loop
             
             
-            
-            # print(f"q1 is {q1}")
             tempfield[0] = self.die_temp_l
                          
             tempfield[-1] = self.die_temp_r
@@ -164,7 +160,8 @@ class HT_sim():
                     k_m = self.model_k.predict([[tempfield[n]]]) # include the model for k from Zhang
                     cp_m = self.model_cp.predict([[tempfield[n]]]) # include the model for cp from Zhang
                     rho_m = self.rho_ramp(tempfield[n], self.rho_l, self.rho_s, self.T_L, self.T_S) #inlcude the model for rho from Zhang
-                    self.alpha_m = k_m / ((rho_m * (cp_m)) + self.latent_heat(tempfield[n]))# Figureout how the eqn cameup
+                    denom = rho_m * (cp_m - self.latent_heat(tempfield[n]))
+                    self.alpha_m = k_m / denom# Figureout how the eqn cameup
                     
                     tempfield[n] += ((self.alpha_m * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))

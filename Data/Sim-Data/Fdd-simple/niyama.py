@@ -1,0 +1,96 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+class Niyama:
+    
+    """
+    Niyama class for calculating Niyama values based on
+    a given temperature array.
+    
+    Attributes
+    ----------
+    temperature : numpy.ndarray
+        A 2D array representing the temperature distribution.
+    niyama : numpy.ndarray
+        A 2D array representing the Niyama values.
+    niyama_critical : float
+    material variables
+        A dictionary containing material properties.
+    
+    Methods
+    -------
+    calculate_niyama()
+        Calculates the Niyama values based on the temperature array.
+    get_niyama()
+        Returns the Niyama values.
+    get_niyama_critical()
+        Returns the critical Niyama value.
+    plot_niyama()
+        Plots the Niyama values with highlihgted niyama critical values.
+    """
+    
+    def __init__(self, temperature, niyama_critical=0.5):
+        """
+        Initializes the Niyama class with a temperature array and
+        a critical Niyama value.
+        
+        Parameters
+        ----------
+        temperature : numpy.ndarray
+            A 2D array representing the temperature distribution.
+        niyama_critical : float, optional
+            The critical Niyama value (default is 0.5).
+        """
+        self.temperature = temperature
+        self.niyama_critical = niyama_critical
+        self.lambda_sdas = 2.0
+        self.delta_P_cr = 2.0
+        self.mu_liq = 24.0e-3
+        self.rho_liq = 2369.0
+        self.rho_sol = 2400.0
+        self.delta_Tf = 56.0
+        self.dx = 0.00020408163265306123
+        self.dt = 0.00014676749271137028
+        self.g = np.gradient(temperature, self.dx,
+                             axis=0)
+        self.T_dot = np.gradient(temperature, self.dt,
+                                 axis=1)
+    def compute_dimensionless_niyama(self):
+        """
+        Compute the dimensionless Niyama criterion Ny*
+
+        Parameters:
+            lambda_sdas : float or np.ndarray
+                Secondary dendrite arm spacing (in meters)
+            delta_P_cr : float
+                Critical pressure drop (Pa)
+            mu_liq : float
+                Dynamic viscosity of liquid metal (Pa·s)
+            rho_liq : float
+                Density of liquid phase (kg/m³)
+            rho_sol : float
+                Density of solid phase (kg/m³)
+            delta_Tf : float
+                Freezing range (T_l - T_s) in K or °C
+
+        Returns:
+            Ny_star : float or np.ndarray
+                Dimensionless Niyama criterion
+        """
+        beta = (self.rho_sol - self.rho_liq) / self.rho_liq
+        num = self.lambda_sdas * self.delta_P_cr * self.g
+        denom = (self.mu_liq * beta * self.delta_Tf * self.T_dot)**(1/2)
+        Ny_star = num/denom 
+        return Ny_star
+        
+    def plot_niyama(self):
+        """
+        Plots the Niyama values with highlighted critical values.
+        """
+        plt.imshow(self.Ny_star, cmap='hot', interpolation='nearest')
+        plt.colorbar(label='Niyama Value')
+        plt.contour(self.niyama, levels=[self.niyama_critical], colors='blue')
+        plt.title('Niyama Values with Critical Contour')
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+        plt.show()

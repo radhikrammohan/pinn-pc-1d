@@ -1,6 +1,6 @@
 {
-  "length": 10.0e-3,
-  "time_end": 10.0,
+  "length": 15.0e-3,
+  "time_end": 240.0,
   "num_points":50,
   "t_surr": 298.0,
   "temp_init":919.0,
@@ -25,8 +25,8 @@
 
   "htc":10.0,
 
-  "die_temp_l": 828.0,
-  "die_temp_r": 828.0,
+  "die_temp_l": 829.0,
+  "die_temp_r": 829.0,
 
   "model_k_path": "model_k.joblib",
   "model_cp_path": "model_cp.joblib"
