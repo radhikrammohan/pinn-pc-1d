@@ -9,3 +9,9 @@ __pycache__/
 
 pinn-1d/
 Data/Sim-Data/Fdd-simple/heat_data.csv
+Data/Sim-Data/Fdd-simple/heat_data_mushy.csv
+
+Data/DOE/Sensitivity analysis/Old_DOE/1D_HT_DOE_4.ipynb
+
+simple-nn/data/heat_data_mushy.csv
+simple-nn/data/heat_data.csv
