@@ -44,7 +44,7 @@ torch.manual_seed(1234)
 
 # %%
 # import .csv dataset 
-file_path = "../../data/heat_data.csv"
+file_path = "../../data/heat_data_mushy.csv"
 temp1 = pd.read_csv(file_path)
 
 temp2=temp1.copy()

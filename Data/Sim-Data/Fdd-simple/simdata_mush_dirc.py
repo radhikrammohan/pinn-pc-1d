@@ -151,13 +151,13 @@ class HT_sim():
         for m in range(1, self.num_steps+1):                                                                            # time loop
             
             
-            htc = self.htc                  # htc of Still air in W/m^2-K
-            q1 = htc*(temp_int[0]-self.t_surr)   # Heat flux at the left boundary
+            # htc = self.htc                  # htc of Still air in W/m^2-K
+            # q1 = htc*(temp_int[0]-self.t_surr)   # Heat flux at the left boundary
     
             # print(f"q1 is {q1}")
             # tempfield[0] = temp_int[0] + self.alpha_l * self.step_coeff * ((2.0*temp_int[1]) - (2.0 * temp_int[0])-(2.0*self.dx*(q1)))  # Update boundary condition temperature
             tempfield[0] = self.die_temp_l
-            q2 = htc*(temp_int[-1]-self.t_surr)                   # Heat flux at the right boundary
+            # q2 = htc*(temp_int[-1]-self.t_surr)                   # Heat flux at the right boundary
             # tempfield[-1] = temp_int[-1] + self.alpha_l * self.step_coeff * ((2.0*temp_int[-2]) - (2.0 * temp_int[-1])-(2.0*self.dx*(q2)))  # Update boundary condition temperature
     
             tempfield[-1] = self.die_temp_r

@@ -1,6 +1,6 @@
 {
   "length": 10.0e-3,
-  "time_end": 10.0,
+  "time_end": 5.0,
   "num_points":50,
   "t_surr": 298.0,
   "temp_init":919.0,
@@ -23,10 +23,15 @@
   "T_L":886.0,
   "T_S": 830.0,
 
-  "htc":10.0,
+  "C_lambda":40.9e-6,
+  "del_Pcr":1.01e5,
+  "dyn_visc":1.2e-3,
 
-  "die_temp_l": 828.0,
-  "die_temp_r": 828.0,
+  "htc_l":10.0,
+  "htc_r":10.0,
+
+  "die_temp_l": 820.0,
+  "die_temp_r": 820.0,
 
   "model_k_path": "model_k.joblib",
   "model_cp_path": "model_cp.joblib"
