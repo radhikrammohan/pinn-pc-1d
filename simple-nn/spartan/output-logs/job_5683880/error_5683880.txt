@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/scratch3/ram128/pinn-pc-1d/simple-nn/spartan/jobs/model_train.py", line 75, in <module>
+    with open(scaler_file, 'wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'model-files/job_5683880/scalers.pkl'
