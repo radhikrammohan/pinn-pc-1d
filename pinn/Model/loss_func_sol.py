@@ -1,4 +1,5 @@
-
+import json
+import os
 import sys
 import math
 import numpy as np
@@ -25,52 +26,47 @@ else:
 
 print('Using device:', device)
 
+json_path = os.path.join(os.path.dirname(__file__), '../training_data/settings.json')
+with open(json_path) as json_file:
+    props = json.load(json_file)
+
 # Material properties
-rho = 2300.0                     # Density of AL380 (kg/m^3)
-rho_l = 2460.0                   # Density of AL380 (kg/m^3)
-rho_l_t = torch.tensor(rho_l,dtype=torch.float32,device=device)
-rho_s = 2710.0                    # Density of AL380 (kg/m^3)
-rho_s_t = torch.tensor(rho_s,dtype=torch.float32,device=device)
+
+rho_l_t = torch.tensor(props['rho_l'],dtype=torch.float32,device=device)
+                   # Density of AL380 (kg/m^3)
+rho_s_t = torch.tensor(props['rho_s'],dtype=torch.float32,device=device)
 
 # rho_m = (rho_l + rho_s )/2       # Desnity in mushy zone is taken as average of liquid and solid density
 
-k = 104.0                       # W/m-K
-k_l = k                       # W/m-K
-k_l_t = torch.tensor(k_l,dtype=torch.float32,device=device)
-k_s = 96.2                    # W/m-K
-k_s_t = torch.tensor(k_s,dtype=torch.float32,device=device)
+                      # W/m-K
+k_l_t = torch.tensor(props['k_l'],dtype=torch.float32,device=device)
+                  # W/m-K
+k_s_t = torch.tensor(props['k_s'],dtype=torch.float32,device=device)
 # k_m =  (k_l+k_s)/2                     # W/m-K
-k_mo = 41.5
+k_mo = torch.tensor(props['k_m'],dtype=torch.float32,device=device)
 
 
-cp = 1245.3                      # Specific heat of aluminum (J/kg-K)
-cp_l = cp                      # Specific heat of aluminum (J/kg-K)
-cp_l_t = torch.tensor(cp_l,dtype=torch.float32,device=device)
-cp_s = 963.0                 # Specific heat of aluminum (J/kg-K)
-cp_s_t = torch.tensor(cp_s,dtype=torch.float32,device=device)
+cp_l_t = torch.tensor(props['cp_l'],dtype=torch.float32,device=device)
+           
+cp_s_t = torch.tensor(props['cp_s'],dtype=torch.float32,device=device)
 # cp_m =  (cp_l+cp_s)/2                 # Specific heat of mushy zone is taken as average of liquid and solid specific heat
 # cp_m = cp
            # Thermal diffusivity
-alpha_l = k_l / (rho_l * cp_l) 
-alpha_l_t = torch.tensor(alpha_l,dtype=torch.float32,device=device)
-# alpha_s = k_s / (rho_s*cp_s)
-# alpha_s_t = torch.tensor(alpha_s,dtype=torch.float32,device=device)
+alpha_l_t = k_l_t / (rho_l_t * cp_l_t) 
+
+alpha_s_t = k_s_t / (rho_s_t*cp_s_t)
+alpha_s_t = torch.tensor(alpha_s_t,dtype=torch.float32,device=device)
 
 # # alpha_m = k_m / (rho_m * cp_m)          #`Thermal diffusivity in mushy zone is taken as average of liquid and solid thermal diffusivity`
 
-
-# #L_fusion = 3.9e3                 # J/kg
-# L_fusion = 389.0e3               # J/kg  # Latent heat of fusion of aluminum
-
-# L_fusion_t = torch.tensor(L_fusion,dtype=torch.float32,device=device)
+L_fusion_t = torch.tensor(props['L_fusion'],dtype=torch.float32,device=device) # J/kg  # Latent heat of fusion of aluminum
 #          # Thermal diffusivity
 
 # t_surr = 500.0 
 # temp_init = 919.0
-T_L = 574.4 +273.0                       #  K -Liquidus Temperature (615 c) AL 380
-T_S = 497.3 +273.0                     # K- Solidus Temperature (550 C)
-T_St = torch.tensor(T_S,dtype=torch.float32,device=device)
-T_Lt = torch.tensor(T_L,dtype=torch.float32,device=device)
+                   
+T_St = torch.tensor(props['T_S'] ,dtype=torch.float32,device=device) # K- Solidus Temperature (550 C)
+T_Lt = torch.tensor(props['T_L'] ,dtype=torch.float32,device=device) #  K -Liquidus Temperature (615 c) AL 380
 
 
 
@@ -93,9 +89,6 @@ def rho_ramp(temp,v1,v2,T_L,T_S):         # Function to calculate density in Mus
     rho_m = torch.where(temp > T_L, v1, torch.where(temp < T_S, v2, v2 + slope*(temp-T_S)))
     
     return rho_m
-
-
-
 
 
 def loss_fn_data(u_pred, u_true):
@@ -143,7 +136,28 @@ def pde_loss(model,x,t,T_S,T_L):
     # T_S_tensor = T_S.clone().detach().to(device)
     # T_L_tensor = T_L.clone().detach().to(device)
     
-    residual = u_t - (u_xx) # Calculate the residual of the PDE
+    mask_l = u_pred > T_L
+    mask_s = u_pred < T_S
+    mask_m = (u_pred <= T_L) & (u_pred >= T_S)
+    
+    c1 = rho_l_t * cp_l_t
+    c2 = rho_s_t * cp_s_t
+    Ste = (cp_ramp*(T_Lt- T_St) )/ L_fusion_t
+    c3 = rho_ramp * cp_ramp(1+ 1/Ste)
+    
+    
+    alpha_m = kramp(u_pred,k_l_t,k_s_t,T_L,T_S) \
+        / (rho_ramp(u_pred,rho_l_t,rho_s_t,T_L,T_S) \
+            * cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)) 
+    
+    residual = torch.zeros_like(u_pred).to(device)
+    
+    residual[mask_l] = c1*u_t - alpha_l_t * u_xx[mask_l] # Liquid phase
+    residual[mask_s] = c2*u_t - alpha_s_t * u_xx[mask_s] # Solid phase
+    residual[mask_m] = c3*u_t - alpha_m * u_xx[mask_m] # Mushy phase
+        
+    
+    # residual = u_t - (u_xx) # Calculate the residual of the PDE
    
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))

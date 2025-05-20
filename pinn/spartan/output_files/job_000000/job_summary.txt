@@ -1,0 +1,14 @@
+
+==================== JOB SUMMARY ====================
+Job ID: 000000
+Model Architecture: 30 x 10
+Activation Function: Tanh
+Optimizer: optimizer_1
+Learning Rate: 0.009
+Training Data Source: simdata_mush_dirc.py
+Model File: model_train.py
+Saved Files:
+  - Model Weights: best-model.pth
+  - Training Loss: train-loss.pkl
+  - Testing Loss: test-loss.pkl
+======================================================
