@@ -34,5 +34,10 @@
   "die_temp_r": 820.0,
 
   "model_k_path": "model_k.joblib",
-  "model_cp_path": "model_cp.joblib"
+  "model_cp_path": "model_cp.joblib",
+
+  "epochs": 50,
+  "layers": 8,
+  "neurons": 30,
+  "learning_rate": 0.009
 }

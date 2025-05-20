@@ -32,7 +32,7 @@ sys.path.insert(0,str(model_dir))
     
 
 from training_data.simdata_mush_dirc import  fdd, pdeinp, icinp, bcinp,HT_sim ,scaler, invscaler
-from Model.loss_func import loss_fn_data,pde_loss,ic_loss,boundary_loss
+from Model.loss_func_sol import loss_fn_data,pde_loss,ic_loss,boundary_loss
 from Model.train_testloop import *
 
 
@@ -247,14 +247,14 @@ bcr_loader_test = DataLoader(inp_bcr_dataset_test, batch_size=256, sampler=rand_
 
 
 input_size = 2
-hidden_size = 30 
+hidden_size = props['neurons'] # 64
 output_size=1
 
-learning_rate = 0.009
-hidden_layers = 8
+learning_rate = props['learning_rate'] # 0.001
+hidden_layers = props['layers']
 
 
-epochs_1 = 2
+epochs_1 = props['epochs'] # 1000
 epochs_2 = 10
 from Model.model import PINN
 
@@ -357,7 +357,7 @@ job_id = args.job_id
 summary_text = f"""
 ==================== JOB SUMMARY ====================
 Job ID: {job_id}
-Model Architecture: {hidden_size} x {hidden_layers + 1}
+Model Architecture: {hidden_size} x {hidden_layers}
 Activation Function: {activation_fn}
 Optimizer: {optimizer_used}
 Learning Rate: {learning_rate}
