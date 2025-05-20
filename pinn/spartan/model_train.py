@@ -22,9 +22,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 from torch.optim import Adam, LBFGS
 
-  
-sys.path.insert(0,'/Users/radhikrammohan/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/github/pinn-pc-1d/pinn/training_data/')
-sys.path.insert(0,'/Users/radhikrammohan/Library/CloudStorage/OneDrive-TheUniversityofMelbourne/github/pinn-pc-1d/pinn/')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+training_data_dir = os.path.join(current_dir, '../training_data')
+model_dir = os.path.join(current_dir, '../')
+sys.path.insert(0,str(training_data_dir))
+sys.path.insert(0,str(model_dir))
+
  
     
 
