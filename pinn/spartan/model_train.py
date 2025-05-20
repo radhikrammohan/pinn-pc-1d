@@ -51,7 +51,9 @@ dt = heat_data.dt
 dx = heat_data.dx
 # print(heat_data.dx)
 # print(dt)
-with open('../training_data/settings.json') as file:
+
+settings_path = os.path.join(current_dir, '..', 'training_data', 'settings.json')
+with open(settings_path,'r') as file:
     props = json.load(file)
     
 
