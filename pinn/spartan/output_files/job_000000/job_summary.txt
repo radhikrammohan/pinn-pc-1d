@@ -3,7 +3,19 @@
 Job ID: 000000
 Model Architecture: 30 x 10
 Activation Function: Tanh
-Optimizer: optimizer_1
+Optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    lr: 0.009
+    maximize: False
+    weight_decay: 0
+)
 Learning Rate: 0.009
 Training Data Source: simdata_mush_dirc.py
 Model File: model_train.py
