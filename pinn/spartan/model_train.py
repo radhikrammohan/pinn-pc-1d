@@ -36,8 +36,8 @@ from Model.loss_func import loss_fn_data,pde_loss,ic_loss,boundary_loss
 from Model.train_testloop import *
 
 
-
-with open('../training_data/settings.json') as file:
+settings_path_1 = os.path.join(current_dir, '..', 'training_data', 'settings.json')
+with open(settings_path_1,'r') as file:
     settings = json.load(file)
    
 
