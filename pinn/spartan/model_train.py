@@ -254,7 +254,9 @@ learning_rate = props['learning_rate'] # 0.001
 hidden_layers = props['layers']
 
 
+
 epochs_1 = props['epochs'] # 1000
+
 epochs_2 = 10
 from Model.model import PINN
 
