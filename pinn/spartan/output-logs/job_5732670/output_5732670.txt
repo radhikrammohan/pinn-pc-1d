@@ -1,0 +1,3 @@
+Using device: cuda
+Using device: cuda
+Using device: cuda

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/jobs/../model_train.py", line 40, in <module>
+    with open('../training_data/settings.json') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '../training_data/settings.json'
