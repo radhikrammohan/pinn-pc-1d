@@ -94,7 +94,7 @@ inp_data = fdd(15e-3, time_end, numpoints, num_steps)
 
 # input dataset-pde residual
 # The pde inputs are generated using the pdeinp function in simdata.py
-pde_data = pdeinp(dx,length-dx,dt,time_end,pde_pts,"Sobol") 
+pde_data = pdeinp(dx,length-dx,dt,time_end,pde_pts,"Sobol",scl="False") 
 
 # pde_data2 = scale2(pde_data,x_c,t_c)
 

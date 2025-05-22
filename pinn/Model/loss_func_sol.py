@@ -17,6 +17,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 
+import logging
+
+logging.basicConfig(filename='log.txt', level=logging.INFO, filemode='w')
+
+
 if torch.backends.mps.is_available():
     print("MPS is available")
     device = torch.device('mps')
@@ -55,7 +60,7 @@ cp_s_t = torch.tensor(props['cp_s'],dtype=torch.float32,device=device)
 alpha_l_t = k_l_t / (rho_l_t * cp_l_t) 
 
 alpha_s_t = k_s_t / (rho_s_t*cp_s_t)
-alpha_s_t = torch.tensor(alpha_s_t,dtype=torch.float32,device=device)
+# alpha_s_t = torch.tensor(alpha_s_t,dtype=torch.float32,device=device)
 
 # # alpha_m = k_m / (rho_m * cp_m)          #`Thermal diffusivity in mushy zone is taken as average of liquid and solid thermal diffusivity`
 
@@ -67,6 +72,7 @@ L_fusion_t = torch.tensor(props['L_fusion'],dtype=torch.float32,device=device) #
                    
 T_St = torch.tensor(props['T_S'] ,dtype=torch.float32,device=device) # K- Solidus Temperature (550 C)
 T_Lt = torch.tensor(props['T_L'] ,dtype=torch.float32,device=device) #  K -Liquidus Temperature (615 c) AL 380
+
 
 
 
@@ -142,8 +148,8 @@ def pde_loss(model,x,t,T_S,T_L):
     
     c1 = rho_l_t * cp_l_t
     c2 = rho_s_t * cp_s_t
-    Ste = (cp_ramp*(T_Lt- T_St) )/ L_fusion_t
-    c3 = (1+ 1/Ste)
+    Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
+    c3 = (1+ (1/Ste))
     
     
     alpha_m = kramp(u_pred,k_l_t,k_s_t,T_L,T_S) \
@@ -152,16 +158,20 @@ def pde_loss(model,x,t,T_S,T_L):
     
     residual = torch.zeros_like(u_pred).to(device)
     
-    residual[mask_l] = u_t - alpha_l_t * u_xx[mask_l] # Liquid phase
-    residual[mask_s] = u_t - alpha_s_t * u_xx[mask_s] # Solid phase
-    residual[mask_m] = c3*u_t - alpha_m * u_xx[mask_m] # Mushy phase
+    if mask_l.any():
+        residual[mask_l] = u_t[mask_l] - alpha_l_t * u_xx[mask_l] # Liquid phase
+    if mask_s.any():
+        residual[mask_s] = u_t[mask_s] - alpha_s_t * u_xx[mask_s]
+    if mask_m.any():
+        residual[mask_m] = c3*u_t[mask_m] - alpha_m * u_xx[mask_m]
         
+ 
     
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
-   
+    # Print statements for debugging
+    
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
-    # print(resid_mean.dtype)
     
     return resid_mean
 
@@ -208,7 +218,7 @@ def boundary_loss(model,x,t,t_surr,t_init):
     
     # bc_mean =  torch.mean(torch.square(u_pred-bc))
     # bc_mean = nn.MSELoss()(u_pred,bc)
-   
+    
     return bc_mean
 
 def ic_loss(model,x,t,temp_init):
@@ -225,6 +235,7 @@ def ic_loss(model,x,t,temp_init):
    
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))
+    
     return ic_mean
 
 def accuracy(u_pred, u_true):

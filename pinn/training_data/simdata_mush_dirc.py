@@ -290,7 +290,7 @@ def pdeinp(x_min, x_max, t_min, t_max, n_samples, sampler, scl="True"):
         raise ValueError("Invalid sampler specified. Choose from 'random',\
             'uniform', 'LHS', 'Halton', 'Hammersley', 'Sobol'.")
     if scl=="True":
-        print("scaling initated")
+        print("scaling initiated")
         inp_pde[:,0] = scaler(inp_pde[:,0], x_min, x_max)
         inp_pde[:,1] = scaler(inp_pde[:,1], t_min, t_max)
     else:

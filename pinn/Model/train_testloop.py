@@ -5,7 +5,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 from torch.optim import Adam
 
-from Model.loss_func import loss_fn_data,pde_loss,ic_loss,boundary_loss
+from Model.loss_func_sol import loss_fn_data,pde_loss,ic_loss,boundary_loss
+
 
 
 
@@ -110,18 +111,16 @@ def training_loop(epochs, model, \
             bc_loss_right = boundary_loss(model, inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1), t_surrt,temp_init_t)
             bc_loss = 0.5*(bc_loss_left + bc_loss_right)
             # Calculate individual losses
-           
             phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
-          
-          
+
             # Define weights for the different losses
-            w0, w1, w2, w3 = 1, 1, 1,1
+            w0, w1, w2, w3 = 1, 1, 1, 1
             # Calculate total loss
-            loss =  w1 * phy_loss + w2 * init_loss + w3 * bc_loss
+            loss = w1 * phy_loss + w2 * init_loss + w3 * bc_loss
             # loss =  w1 * phy_loss + w2 * init_loss + w3 * bc_loss
             # Backpropagation
             loss.backward(retain_graph=True)  # Backpropagate the gradients
-            
+
             def closure():
                 optimizer.zero_grad()
                 loss.backward()

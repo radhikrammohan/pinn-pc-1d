@@ -1,7 +1,7 @@
 
 ==================== JOB SUMMARY ====================
 Job ID: 000000
-Model Architecture: 30 x 10
+Model Architecture: 20 x 7
 Activation Function: Tanh
 Optimizer: Adam (
 Parameter Group 0
