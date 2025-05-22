@@ -1,0 +1,15 @@
+/scratch3/ram128/pinn-pc-1d/pinn-1d/lib/python3.12/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+20002=20002. 
+  warnings.warn(
+/scratch3/ram128/pinn-pc-1d/pinn-1d/lib/python3.12/site-packages/torch/autograd/graph.py:823: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:180.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+Traceback (most recent call last):
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/jobs/../model_train.py", line 277, in <module>
+    loss_train,loss_test,best_model = training_loop(epochs_1, model, loss_fn_data, \
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/../Model/train_testloop.py", line 114, in training_loop
+    phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/../Model/loss_func_sol.py", line 166, in pde_loss
+    residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m * u_xx[mask_m].view(-1) # Mushy phase
+    ~~~~~~~~^^^^^^^^
+RuntimeError: shape mismatch: value tensor of shape [256, 2] cannot be broadcast to indexing result of shape [2]
