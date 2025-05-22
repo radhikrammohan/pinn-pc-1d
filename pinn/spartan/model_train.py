@@ -71,9 +71,9 @@ temp_data = tempfield.flatten()
 num_steps = tempfield.shape[0]
 numpoints = tempfield.shape[1] 
 
-pde_pts= 20000
-ic_pts = 20000
-bc_pts = 20000
+pde_pts= props['pde_pts']
+ic_pts = props['ic_pts']
+bc_pts = props['bc_pts']
 
 # x_c = 1/length
 # t_c = (alpha/(length**2))
@@ -127,7 +127,7 @@ inp_bclt = torch.tensor(bc_ldata).float().to(device)
 inp_bclr = torch.tensor(bc_rdata).float().to(device)
 
 
-
+# Tensor the target values
 temp_t = torch.tensor(temp_data).float().to(device)
 temp_t = temp_t.view(-1,1)
 
