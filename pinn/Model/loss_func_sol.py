@@ -159,17 +159,15 @@ def pde_loss(model,x,t,T_S,T_L):
     residual = torch.zeros_like(u_pred).to(device)
     
     if mask_l.any():
-        residual[mask_l] = u_t[mask_l] - alpha_l_t * u_xx[mask_l] # Liquid phase
+        residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
     if mask_s.any():
-        residual[mask_s] = u_t[mask_s] - alpha_s_t * u_xx[mask_s]
+        residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
     if mask_m.any():
-        residual[mask_m] = c3*u_t[mask_m] - alpha_m * u_xx[mask_m]
-        
- 
-    
+        residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m * u_xx[mask_m].view(-1) # Mushy phase
+
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
     # Print statements for debugging
-    
+
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
     
