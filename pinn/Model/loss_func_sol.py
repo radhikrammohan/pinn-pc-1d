@@ -146,7 +146,7 @@ def pde_loss(model,x,t,T_S,T_L):
     mask_s = u_pred < T_S
     mask_m = (u_pred <= T_L) & (u_pred >= T_S)
     
-    Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
+    
     
     def Ste(u_pred):
         Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
