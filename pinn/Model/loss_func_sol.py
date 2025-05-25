@@ -146,28 +146,34 @@ def pde_loss(model,x,t,T_S,T_L):
     mask_s = u_pred < T_S
     mask_m = (u_pred <= T_L) & (u_pred >= T_S)
     
-    c1 = rho_l_t * cp_l_t
-    c2 = rho_s_t * cp_s_t
     Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
-    c3 = (1+ (1/Ste))
+    
+    def Ste(u_pred):
+        Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
+        return Ste
     
     
-    alpha_m = kramp(u_pred,k_l_t,k_s_t,T_L,T_S) \
-        / (rho_ramp(u_pred,rho_l_t,rho_s_t,T_L,T_S) \
-            * cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)) 
+    
+    def alpha_m(u_pred):
+        alpha_m = kramp(u_pred,k_l_t,k_s_t,T_L,T_S) \
+            / (rho_ramp(u_pred,rho_l_t,rho_s_t,T_L,T_S) \
+                * cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)) 
+        return alpha_m
+   
     
     residual = torch.zeros_like(u_pred).to(device)
     
+   
     if mask_l.any():
         residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
     if mask_s.any():
         residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
     if mask_m.any():
-        residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m * u_xx[mask_m].view(-1) # Mushy phase
+        c3 = (1+ 1/Ste(u_pred[mask_m]))
+        residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m(u_pred[mask_m]) * u_xx[mask_m].view(-1) # Mushy phase
 
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
-    # Print statements for debugging
-
+   
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
     
