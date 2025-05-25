@@ -1,7 +1,7 @@
 
 ==================== JOB SUMMARY ====================
 Job ID: 000000
-Model Architecture: 20 x 7
+Model Architecture: 5 x 4
 Activation Function: Tanh
 Optimizer: Adam (
 Parameter Group 0
@@ -18,7 +18,7 @@ Parameter Group 0
 )
 Learning Rate: 0.009
 Training Data Source: simdata_mush_dirc.py
-Model File: model_train.py
+Model File: model_train_norm.py
 Saved Files:
   - Model Weights: best-model.pth
   - Training Loss: train-loss.pkl
