@@ -22,10 +22,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 from torch.optim import Adam, LBFGS
 
-try:
-    current_dir = os.getcwd()
-except:
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
     
 training_data_dir = os.path.join(current_dir, '../training_data')
 model_dir = os.path.join(current_dir, '../')
