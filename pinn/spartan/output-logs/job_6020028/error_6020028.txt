@@ -1,0 +1,14 @@
+/scratch3/ram128/pinn-pc-1d/pinn-1d/lib/python3.12/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+25002=25002. 
+  warnings.warn(
+/scratch3/ram128/pinn-pc-1d/pinn-1d/lib/python3.12/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+12502=12502. 
+  warnings.warn(
+/scratch3/ram128/pinn-pc-1d/pinn-1d/lib/python3.12/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+12502=12502. 
+  warnings.warn(
+Traceback (most recent call last):
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/jobs/../model_train.py", line 274, in <module>
+    loss_train,loss_test,best_model = training_loop(epochs_1, model, loss_fn_data, \
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/../Model/train_testloop.py", line 49, in training_loop
+    die_temp_l = temp_var["die_temp_l"]
+                 ~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'die_temp_l'
