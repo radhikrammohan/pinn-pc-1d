@@ -144,13 +144,11 @@ t_surr = props['t_surr']                   #  K -Surrounding Temperature (500 c)
 T_lt = torch.tensor(T_L).float().to(device)    # Liquidus Temperature tensor
 T_st = torch.tensor(T_S).float().to(device)    # Solidus Temperature tensor
 t_surrt = torch.tensor(t_surr).float().to(device)   # Surrounding Temperature tensor
+die_left = props['die_temp_l']
+die_right = props['die_temp_r']
+temp_var = {"T_st":T_st,"T_lt":T_lt,"t_surrt":t_surrt,"temp_init_t":temp_init_t,\
+               "die_temp_l":die_left,"die_temp_r":die_right} # temperature variables dictionary
 
-temp_var = {"T_st":T_st,"T_lt":T_lt,"t_surrt":t_surrt,"temp_init_t":temp_init_t}
-
-# %% [markdown]
-# ### Dataset Preparation for pytorch
-
-# %%
 train_inputs,test_inputs =train_test_split(input_t,test_size=0.2,random_state=42) # input data split
 # print(train_inputs.shape)
 tr_inp_pde,ts_inp_pde = train_test_split( inp_pdet,test_size=0.2,random_state=42) # input pde data split

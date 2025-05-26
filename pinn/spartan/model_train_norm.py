@@ -153,8 +153,11 @@ T_lt = torch.tensor(T_L_s).float().to(device)    # Liquidus Temperature tensor
 T_st = torch.tensor(T_S_s).float().to(device)    # Solidus Temperature tensor
 t_surrt = torch.tensor(t_surr_s).float().to(device)   # Surrounding Temperature tensor
 
-temp_var = {"T_st":T_st,"T_lt":T_lt,"t_surrt":t_surrt,"temp_init_t":temp_init_t}
-print(temp_var)
+die_left = props['die_temp_l']
+die_right = props['die_temp_r']
+temp_var = {"T_st":T_st,"T_lt":T_lt,"t_surrt":t_surrt,"temp_init_t":temp_init_t,\
+               "die_temp_l":die_left,"die_temp_r":die_right} # temperature variables dictionary
+
 # %% [markdown]
 # ### Dataset Preparation for pytorch
 
