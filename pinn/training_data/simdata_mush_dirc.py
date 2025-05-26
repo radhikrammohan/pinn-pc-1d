@@ -306,7 +306,7 @@ def pdeinp(x_min, x_max, t_min, t_max, n_samples, sampler, scl="True"):
 
 def pde_act_pts(x_min, x_max, t_min, t_max, t_lim,n_samples, sampler, scl="True"):
     #module to tailor pde poitns at more action points
-    n_dist = int(n_samples*0.8)
+    n_dist = int(n_samples*0.5)
     n_rem = n_samples - n_dist
     if sampler == "random":
         inp_pde_main = unidata(x_min, x_max, t_min, t_max, n_dist, sampler)

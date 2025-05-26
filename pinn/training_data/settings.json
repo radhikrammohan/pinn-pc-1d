@@ -1,5 +1,5 @@
 {
-  "length": 10.0e-3,
+  "length": 15.0e-3,
   "time_end": 5.0,
   "num_points":50,
   "t_surr": 298.0,
@@ -39,7 +39,7 @@
   "epochs": 10000,
   "layers": 4,
   "neurons": 5,
-  "learning_rate": 0.009,
+  "learning_rate": 0.005,
   "pde_pts" : 25000,
   "ic_pts" : 25000,
   "bc_pts" :25000

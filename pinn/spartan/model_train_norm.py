@@ -31,7 +31,7 @@ sys.path.insert(0,str(model_dir))
 
 from simdata_mush_dirc import  *
 from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
-from Model.train_testloop import *
+from Model.train_testloop_norm import *
 
 
 settings_path_1 = os.path.join(current_dir, '..', 'training_data', 'settings.json')
@@ -80,7 +80,7 @@ k_max = props['k_l']
 rho_max = props['rho_s']
 cp_max = props['cp_l']
 alpha_max = k_max / (rho_max * cp_max)
-t_c = (alpha_max/(length**2))
+t_c = alpha_max/(length**2)
 temp_c = props['temp_init']
 
 inp_data = fdd(15e-3, time_end, numpoints, num_steps)
@@ -122,10 +122,7 @@ else:
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
 
-# print('Using device:', device)
 
-# %% [markdown]
-# ### Tensor inputs
 
 input_t = torch.tensor(inp_data2).float().to(device)
 inp_pdet = torch.tensor(pde_data_new2).float().to(device)

@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 from torch.optim import Adam
 
-from Model.loss_func_sol import loss_fn_data,pde_loss,ic_loss,boundary_loss
+from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
 
 
 
