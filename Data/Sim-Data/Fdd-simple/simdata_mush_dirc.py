@@ -157,7 +157,11 @@ class HT_sim():
             # print(f"q1 is {q1}")
             # tempfield[0] = temp_int[0] + self.alpha_l * self.step_coeff * ((2.0*temp_int[1]) - (2.0 * temp_int[0])-(2.0*self.dx*(q1)))  # Update boundary condition temperature
             tempfield[0] = self.die_temp_l
+<<<<<<< HEAD
             # q2 = htc*(temp_int[-1]-self.t_surr)                   # Heat flux at the right boundary
+=======
+            q2 = htc*(temp_int[-1]-self.t_surr)                   # Heat flux at the right boundary
+>>>>>>> 35b92a0 (ne changes like package structure)
             # tempfield[-1] = temp_int[-1] + self.alpha_l * self.step_coeff * ((2.0*temp_int[-2]) - (2.0 * temp_int[-1])-(2.0*self.dx*(q2)))  # Update boundary condition temperature
     
             tempfield[-1] = self.die_temp_r

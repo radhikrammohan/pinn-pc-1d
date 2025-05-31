@@ -160,7 +160,8 @@ class HT_sim():
                     k_m = self.model_k.predict([[tempfield[n]]]) # include the model for k from Zhang
                     cp_m = self.model_cp.predict([[tempfield[n]]]) # include the model for cp from Zhang
                     rho_m = self.rho_ramp(tempfield[n], self.rho_l, self.rho_s, self.T_L, self.T_S) #inlcude the model for rho from Zhang
-                    self.alpha_m = k_m / ((rho_m * (cp_m)) + self.latent_heat(tempfield[n]))# Figureout how the eqn cameup
+                    denom = rho_m * (cp_m - self.latent_heat(tempfield[n]))
+                    self.alpha_m = k_m / denom# Figureout how the eqn cameup
                     
                     tempfield[n] += ((self.alpha_m * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))

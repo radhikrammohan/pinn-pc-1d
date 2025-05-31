@@ -41,6 +41,6 @@
   "neurons": 5,
   "learning_rate": 0.005,
   "pde_pts" : 25000,
-  "ic_pts" : 25000,
-  "bc_pts" :25000
+  "ic_pts" : 40000,
+  "bc_pts" :40000
 }

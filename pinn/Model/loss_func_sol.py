@@ -176,40 +176,18 @@ def pde_loss(model,x,t,T_S,T_L,epoch):
     
     residual = torch.zeros_like(u_pred).to(device)
 
-    # print(f"alpha_l_t: {alpha_l_t.item():.6f}, alpha_s_t: {alpha_s_t.item():.6f}")
+    if mask_l.any():
+        residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
+        # print("Liquid phase residual calculated")
+    if mask_s.any():
+        residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
+        # print("Solid phase residual calculated")
+    if mask_m.any():
+        c3 = (1+ 1/Ste(u_pred[mask_m]))
+        residual[mask_m] = u_t[mask_m].view(-1) - (alpha_m(u_pred[mask_m]) /c3) * u_xx[mask_m].view(-1) # Mushy phase
+        # print("Mushy phase residual calculated")
 
-    # if mask_l.any():
-    #     residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
-    #     print(f"Liquid Phase-u_pred:{torch.mean(u_pred[mask_l]).item():.6f},Liquid phase-u_t: {torch.mean(u_t[mask_l]).item():.6f},\
-    #     Liquid phase-residual: {torch.mean(residual[mask_l]).item():.6f},\
-    #     Liquid phase-alpha_l_t: {alpha_l_t.item():.6f},\
-    #     Liquid phase-u_xx: {torch.mean(u_xx[mask_l]).item():.6f}")
-
-    # elif mask_s.any():
-    #     residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
-    #     print(f"Solid phase-u_pred: {torch.mean(u_pred[mask_s]).item():.6f}, Solid phase-u_t: {torch.mean(u_t[mask_s]).item():.6f},\
-    #           Solid phase-residual: {torch.mean(residual[mask_s]).item():.6f},\
-    #           Solid phase-alpha_s_t: {alpha_s_t.item():.6f},\
-    #           Solid phase-u_xx: {torch.mean(u_xx[mask_s]).item():.6f}")
-
-    # elif mask_m.any():
-    #     c3 = (1+ 1/Ste(u_pred[mask_m]))
-        
-    #     residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m(u_pred[mask_m]) * u_xx[mask_m].view(-1) # Mushy phase
-
-    #     print(f" Mushy u_pred: {torch.mean(u_pred[mask_m]).item():.6f}, Mushy phase-residual: {torch.mean(residual[mask_m]).item():.6f}, \
-    #             Mushy phase-c3: {c3.mean().item():.6f}, \
-    #             Mushy phase-alpha_m: {alpha_m(u_pred[mask_m]).mean().item():.6f}, \
-    #             Mushy phase-u_t: {torch.mean(u_t[mask_m]).item():.6f}, \
-    #             Mushy phase-u_xx: {torch.mean(u_xx[mask_m]).item():.6f}, \
-    #                 Mushy phase-Ste: {Ste(u_pred[mask_m]).mean().item():.6f}")
-    residual = u_t - alpha_l_t * u_xx
-    residual = u_t - alpha_s_t * u_xx
-    c3 = (1 + 1 / Ste(u_pred))
-    residual = c3 * u_t - alpha_m(u_pred) * u_xx # Mushy phase
-    # residual = u_t - (u_xx) # Calculate the residual of the PDE
-    print(f"u_pred: {torch.mean(u_pred).item():.6f}, u_t: {torch.mean(u_t).item():.6f}, \
-            residual: {torch.mean(residual).item():.6f}")
+ 
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
     
@@ -218,18 +196,20 @@ def pde_loss(model,x,t,T_S,T_L,epoch):
 def boundary_loss(model,x,t,t_surr,t_init):
         
     u_pred = model(x,t)
-    # def bc_func(x,t,t_surr,t_init):
-    #     bc = torch.where(t == 0, t_init, t_surr)
-        
-    #     bc = torch.where(torch.logical_and(t > 0 , t < 0.01), (t_surr - t_init)/(0.01)*t, bc)
-        
-    #     bc = torch.where(t > 0.01, t_surr, bc)
-    #     return bc
-    
-    # bc_cal = bc_func(x,t,t_surr,t_init)
-     
-    bc_mean =  torch.mean(torch.square(u_pred-t_surr))
-    
+    # bc = torch.where(t == 0, t_init, t_surr)
+    def bc_func(x,t,t_surr,t_init):
+        bc = torch.where(t == 0, t_init, t_surr)
+
+        bc = torch.where(torch.logical_and(t > 0 , t < 0.000330226858600583), (t_surr - t_init)/(0.000330226858600583)*t, bc)
+
+        bc = torch.where(t > 0.000330226858600583, t_surr, bc)
+        return bc
+
+    bc_cal = bc_func(x,t,t_surr,t_init)
+
+    bc_mean =  torch.mean(torch.square(u_pred-bc_cal))
+    # print(f"Boundary condition loss calculated: {u_pred.mean():.6f}")
+    # bc_mean =  torch.mean(torch.square(u_pred-t_surr))
     # bc_mean =  torch.mean(torch.square(u_pred-bc))
     # bc_mean = nn.MSELoss()(u_pred,bc)
     

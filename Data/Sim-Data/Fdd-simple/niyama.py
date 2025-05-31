@@ -41,6 +41,7 @@ class Niyama:
         niyama_critical : float, optional
             The critical Niyama value (default is 0.5).
         """
+<<<<<<< HEAD
         self.length = 15.0e-3
         self.time_end = 5.0
         self.temperature = temperature
@@ -59,12 +60,32 @@ class Niyama:
                              axis=0))
         self.T_dot =np.absolute(np.gradient(temperature, self.dt,
                                  axis=1))
+=======
+        self.temperature = temperature
+        self.niyama_critical = niyama_critical
+        self.lambda_sdas = 2.0
+        self.delta_P_cr = 2.0
+        self.mu_liq = 24.0e-3
+        self.rho_liq = 2369.0
+        self.rho_sol = 2400.0
+        self.delta_Tf = 56.0
+        self.dx = 0.00020408163265306123
+        self.dt = 0.00014676749271137028
+        self.g = np.gradient(temperature, self.dx,
+                             axis=0)
+        self.T_dot = np.gradient(temperature, self.dt,
+                                 axis=1)
+>>>>>>> 35b92a0 (ne changes like package structure)
     def compute_dimensionless_niyama(self):
         """
         Compute the dimensionless Niyama criterion Ny*
 
         Parameters:
+<<<<<<< HEAD
             c_lambda : float or np.ndarray
+=======
+            lambda_sdas : float or np.ndarray
+>>>>>>> 35b92a0 (ne changes like package structure)
                 Secondary dendrite arm spacing (in meters)
             delta_P_cr : float
                 Critical pressure drop (Pa)
@@ -81,6 +102,7 @@ class Niyama:
             Ny_star : float or np.ndarray
                 Dimensionless Niyama criterion
         """
+<<<<<<< HEAD
         
         beta = (self.rho_sol -self.rho_liq)/ self.rho_sol
         k1a = (self.mu_liq * beta * self.delta_Tf)
@@ -167,3 +189,22 @@ class Niyama:
     #     plt.tight_layout()
     #     plt.show()
         
+=======
+        beta = (self.rho_sol - self.rho_liq) / self.rho_liq
+        num = self.lambda_sdas * self.delta_P_cr * self.g
+        denom = (self.mu_liq * beta * self.delta_Tf * self.T_dot)**(1/2)
+        Ny_star = num/denom 
+        return Ny_star
+        
+    def plot_niyama(self):
+        """
+        Plots the Niyama values with highlighted critical values.
+        """
+        plt.imshow(self.Ny_star, cmap='hot', interpolation='nearest')
+        plt.colorbar(label='Niyama Value')
+        plt.contour(self.niyama, levels=[self.niyama_critical], colors='blue')
+        plt.title('Niyama Values with Critical Contour')
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+        plt.show()
+>>>>>>> 35b92a0 (ne changes like package structure)

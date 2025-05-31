@@ -141,25 +141,29 @@ class HT_sim():
             rho_m = v2 + slope*(temp-T_S)
         return rho_m
     
+    def Ste(self, temp, cp ,L_fusion):
+
+        Ste = cp *(self.T_L - self.T_S) / (L_fusion)
+        return Ste
+
     def datagen(self):
 
-        tempfield = self.tempfield.copy() 
-       
+        tempfield = self.tempfield.copy()
+
         temp_int = self.tempfield.copy()
         self.temphist = [tempfield.copy()]
         
         for m in range(1, self.num_steps+1):                                                                            # time loop
             
-            
             # htc = self.htc                  # htc of Still air in W/m^2-K
             # q1 = htc*(temp_int[0]-self.t_surr)   # Heat flux at the left boundary
-    
+
             # print(f"q1 is {q1}")
             # tempfield[0] = temp_int[0] + self.alpha_l * self.step_coeff * ((2.0*temp_int[1]) - (2.0 * temp_int[0])-(2.0*self.dx*(q1)))  # Update boundary condition temperature
             tempfield[0] = self.die_temp_l
             # q2 = htc*(temp_int[-1]-self.t_surr)                   # Heat flux at the right boundary
             # tempfield[-1] = temp_int[-1] + self.alpha_l * self.step_coeff * ((2.0*temp_int[-2]) - (2.0 * temp_int[-1])-(2.0*self.dx*(q2)))  # Update boundary condition temperature
-    
+
             tempfield[-1] = self.die_temp_r
             for n in range(1,self.num_points-1):              # space loop, adjusted range
                 
@@ -174,6 +178,10 @@ class HT_sim():
                     rho_m = self.rho_ramp(tempfield[n], self.rho_l, self.rho_s, self.T_L, self.T_S)
                     self.alpha_m = k_m / (rho_m * (cp_m + (self.L_fusion/(self.T_L-self.T_S))))
                     
+                    Ste_m = self.Ste(tempfield[n], cp_m, self.L_fusion)  # Calculate Stefan number
+                    c3 = 1+ (1/Ste_m)
+                    self.alpha_new = self.alpha_m/c3
+                    
                     tempfield[n] += ((self.alpha_m * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))
                 
@@ -183,7 +191,7 @@ class HT_sim():
                     
                 else:  # Invalid temperature range
                     raise ValueError(f"Temperature {tempfield[n]} at index {n} is out of bounds.")
-                                                                      # Update temperature
+                                                                        # Update temperature
             temp_int = tempfield.copy()                                                                  # Update last time step temperature
             self.temphist.append(tempfield.copy())                                                  # Append the temperature history to add ghost points
                                             # Store midpoint temperature

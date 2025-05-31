@@ -110,7 +110,7 @@ bc_rdata = bcinp(length,time_end,bc_pts,dt,scl="False")[1]
 bc_ldata2 = scale2(bc_ldata,x_c,t_c)
 bc_rdata2 = scale2(bc_rdata,x_c,t_c)
 
-t_lim = 3
+t_lim = 4.5
 pde_data_new = pde_act_pts(dx,length-dx,dt,time_end,t_lim,pde_pts,"Sobol",scl="False") 
 pde_data_new2 = scale2(pde_data_new,x_c,t_c)
 
@@ -154,7 +154,9 @@ T_st = torch.tensor(T_S_s).float().to(device)    # Solidus Temperature tensor
 t_surrt = torch.tensor(t_surr_s).float().to(device)   # Surrounding Temperature tensor
 
 die_left = props['die_temp_l']
+die_left = temp_scaler(die_left, temp_init, t_surr) # die left temperature
 die_right = props['die_temp_r']
+die_right = temp_scaler(die_right, temp_init, t_surr) # die right temperature
 temp_var = {"T_st":T_st,"T_lt":T_lt,"t_surrt":t_surrt,"temp_init_t":temp_init_t,\
                "die_temp_l":die_left,"die_temp_r":die_right} # temperature variables dictionary
 

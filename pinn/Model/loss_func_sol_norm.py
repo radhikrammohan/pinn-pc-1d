@@ -161,65 +161,40 @@ def pde_loss(model,x,t,T_S,T_L):
    
     if mask_l.any():
         residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
-        print("Liquid phase residual calculated")
+        # print("Liquid phase residual calculated")
     if mask_s.any():
         residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
-        print("Solid phase residual calculated")
+        # print("Solid phase residual calculated")
     if mask_m.any():
         c3 = (1+ 1/Ste(u_pred[mask_m]))
-        residual[mask_m] = c3*u_t[mask_m].view(-1) - alpha_m(u_pred[mask_m]) * u_xx[mask_m].view(-1) # Mushy phase
-        print("Mushy phase residual calculated")
+        residual[mask_m] = u_t[mask_m].view(-1) - (alpha_m(u_pred[mask_m]) /c3) * u_xx[mask_m].view(-1) # Mushy phase
+        # print("Mushy phase residual calculated")
 
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
    
     resid_mean = torch.mean(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
-    # print(resid_mean.dtype)
+    # print(resid_mean.dtype)ß
     
     return resid_mean
 
 def boundary_loss(model,x,t,t_surr,t_init):
     
-    # x.requires_grad = True
-    # t.requires_grad = True
-    # t_surr_t = torch.tensor(t_surr, device=device)
-    # u_pred = model(x,t).requires_grad_(True)
-    # u_x = torch.autograd.grad(u_pred,x, 
-    #                             torch.ones_like(u_pred).to(device), 
-    #                             create_graph=True,
-    #                             allow_unused =True)[0] # Calculate the first space derivative
-   
-    # htc =10.0
-    # if u_x is None:
-    #     raise RuntimeError("u_x is None")
-    # if u_pred is None:
-    #     raise RuntimeError("u_pred is None")
-    # if t_surr_t is None:
-    #     raise RuntimeError("t_surr_t is None")
-    # res_l = u_x -(htc*(u_pred-t_surr_t))
-    
-    # t_surr_t = t_surr.clone().detach().to(device)
-    
-    # def bc_func(x,t,t_surr,t_init):
-    #     if (t == 0).any():
-    #         return t_init
-    #     else:
-    #         return t_surr
         
     u_pred = model(x,t)
     # bc = torch.where(t == 0, t_init, t_surr)
     def bc_func(x,t,t_surr,t_init):
         bc = torch.where(t == 0, t_init, t_surr)
-        
-        bc = torch.where(torch.logical_and(t > 0 , t < 0.01), (t_surr - t_init)/(0.01)*t, bc)
-        
-        bc = torch.where(t > 0.01, t_surr, bc)
+
+        bc = torch.where(torch.logical_and(t > 0 , t < 0.000330226858600583), (t_surr - t_init)/(0.000330226858600583)*t, bc)
+
+        bc = torch.where(t > 0.000330226858600583, t_surr, bc)
         return bc
-    
+
     bc_cal = bc_func(x,t,t_surr,t_init)
-    
+
     bc_mean =  torch.mean(torch.square(u_pred-bc_cal))
-    print(f"Boundary condition loss calculated: {u_pred.mean():.6f}")
+    # print(f"Boundary condition loss calculated: {u_pred.mean():.6f}")
     # bc_mean =  torch.mean(torch.square(u_pred-t_surr))
     # bc_mean =  torch.mean(torch.square(u_pred-bc))
     # bc_mean = nn.MSELoss()(u_pred,bc)
@@ -240,7 +215,7 @@ def ic_loss(model,x,t,temp_init):
    
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))
-    print(f"Initial condition loss calculated: {u_pred.mean():.6f}")
+    # print(f"Initial condition loss calculated: {u_pred.mean():.6f}")
     return ic_mean
 
 def accuracy(u_pred, u_true):
