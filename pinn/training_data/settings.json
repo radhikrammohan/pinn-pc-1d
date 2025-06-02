@@ -36,10 +36,10 @@
   "model_k_path": "model_k.joblib",
   "model_cp_path": "model_cp.joblib",
 
-  "epochs": 10000,
-  "layers": 4,
-  "neurons": 5,
-  "learning_rate": 0.005,
+  "epochs": 2000,
+  "layers": 5,
+  "neurons": 60,
+  "learning_rate": 0.001,
   "pde_pts" : 25000,
   "ic_pts" : 40000,
   "bc_pts" :40000
