@@ -172,7 +172,7 @@ def pde_loss(model,x,t,T_S,T_L):
 
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
    
-    resid_mean = torch.mean(torch.square(residual))
+    resid_mean = torch.max(torch.square(residual))
     # resid_mean = nn.MSELoss()(residual,torch.zeros_like(residual).to(device))
     # print(resid_mean.dtype)ß
     
@@ -193,7 +193,7 @@ def boundary_loss(model,x,t,t_surr,t_init):
 
     bc_cal = bc_func(x,t,t_surr,t_init)
 
-    bc_mean =  torch.mean(torch.square(u_pred-bc_cal))
+    bc_mean =  torch.max(torch.square(u_pred-bc_cal))
     # print(f"Boundary condition loss calculated: {u_pred.mean():.6f}")
     # bc_mean =  torch.mean(torch.square(u_pred-t_surr))
     # bc_mean =  torch.mean(torch.square(u_pred-bc))
@@ -214,7 +214,7 @@ def ic_loss(model,x,t,temp_init):
     temp_i = torch.full_like(u_pred,temp_init)
    
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
-    ic_mean = torch.mean(torch.square(u_pred-temp_i))
+    ic_mean = torch.max(torch.square(u_pred-temp_i))
     # print(f"Initial condition loss calculated: {u_pred.mean():.6f}")
     return ic_mean
 
