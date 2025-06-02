@@ -207,6 +207,8 @@ class HT_sim():
         X, T = np.meshgrid(x, t)
         return X, T 
     
+    
+    
     def plot_temp(self,idx):
         # Plot the temperature distribution over time at the midpoint
         time_ss= np.linspace(0, self.time_end, self.num_steps+1)
