@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 from torch.optim import Adam
 
-from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
+from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss,pde_resid
 
 
 from logger_config import setup_logger
@@ -61,6 +61,8 @@ def training_loop(epochs, model, \
     die_temp_r = temp_var["die_temp_r"]
     temp_init_t = temp_var["temp_init_t"]
     
+    domain = (0.0, 15e-3, 0.0, 4.0)
+    
     model.to(device)  # Move the model to the GPU
     
     for epoch in range(epochs):
@@ -78,6 +80,7 @@ def training_loop(epochs, model, \
         ic_loss_t = 0
         bc_l_loss_t = 0
         bc_r_loss_t = 0
+
 
 
         # Loop through the training data loaders
@@ -153,7 +156,7 @@ def training_loop(epochs, model, \
                 bc_loss_right = boundary_loss(model, inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1), die_temp_r,temp_init_t)
                 bc_loss = 0.5*(bc_loss_left + bc_loss_right)
                 # Calculate individual losses
-                phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
+                phy_loss= pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt) # PDE loss
 
                 # Define weights for the different losses
                 w0, w1, w2, w3 = 1, 1, 1, 1
@@ -174,8 +177,10 @@ def training_loop(epochs, model, \
             phy_loss_acc += phy_loss.item()
             init_loss_acc += init_loss.item()
             bc_loss_acc += bc_loss.item()
-        
-          
+
+            if epoch %2 == 0:
+                X_refine = adaptive_rar(model,domain, T_st, T_lt,N_cand=10000, top_k=100)
+                inputs_pde = torch.cat([inputs_pde, X_refine.detach()], dim=0)
         
         # Append losses to respective lists for tracking
         if len(train_dataloader) > 0:
@@ -226,12 +231,12 @@ def training_loop(epochs, model, \
             bc_loss_right_t = boundary_loss(model, inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1),die_temp_r,temp_init_t)
             bc_loss_t = 0.5*(bc_loss_left_t + bc_loss_right_t)
             
-            phy_loss_t = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)
+            phy_loss_t= pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)
             
             w0, w1, w2, w3 = 1,1,1,1
             # loss_t =  data_loss_t + init_loss_t + bc_loss_t 
             loss_t = w1 * phy_loss_t + w2 * init_loss_t + w3 * bc_loss_t
-
+            
             test_loss += loss_t.item()
             data_loss_t += data_loss_t.item()
             phy_loss_t += phy_loss_t.item()
@@ -300,3 +305,16 @@ def training_loop(epochs, model, \
     return loss_train, loss_test, best_model
 
 
+def adaptive_rar(model, domain, T_st, T_lt, N_cand=10000,  top_k=10):
+    x_min, x_max, y_min, y_max = domain
+    
+    x = torch.linspace(x_min, x_max, int(N_cand**0.5))
+    y = torch.linspace(y_min, y_max, int(N_cand**0.5))
+    X_cand = torch.cartesian_prod(x.squeeze(), y.squeeze()).to(device)
+    print(f"X_cand shape: {X_cand.shape}")
+    
+    residual = pde_resid(model, X_cand[:, 0].unsqueeze(1), X_cand[:, 1].unsqueeze(1), T_st, T_lt)[1]
+    
+    top_idx = torch.topk(residual, k=top_k).indices
+    
+    return X_cand[top_idx].to(device)
