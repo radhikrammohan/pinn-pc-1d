@@ -125,7 +125,7 @@ else:
 
 
 input_t = torch.tensor(inp_data2).float().to(device)
-inp_pdet = torch.tensor(pde_data_new2).float().to(device)
+inp_pdet = torch.tensor(pde_data2).float().to(device)
 inp_ict = torch.tensor(ic_data2).float().to(device)
 inp_bclt = torch.tensor(bc_ldata2).float().to(device)
 inp_bclr = torch.tensor(bc_rdata2).float().to(device)
