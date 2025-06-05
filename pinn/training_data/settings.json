@@ -37,8 +37,8 @@
   "model_cp_path": "model_cp.joblib",
 
   "epochs": 2000,
-  "layers": 5,
-  "neurons": 60,
+  "layers": 3,
+  "neurons": 500,
   "learning_rate": 0.001,
   "pde_pts" : 25000,
   "ic_pts" : 40000,

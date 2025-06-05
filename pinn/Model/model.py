@@ -17,12 +17,12 @@ class PINN(nn.Module):
 
         # Input layer: Takes input features and maps them to the hidden layer size
         layers.append(nn.Linear(input_size, hidden_size))  # Add the first linear layer
-        layers.append(Sine())  # Apply the activation function (Tanh)
+        layers.append(nn.Tanh())  # Apply the activation function Tanh
 
         # Hidden layers: Create a series of hidden layers with activation functions
         for _ in range(hidden_layers):  # Loop for creating multiple hidden layers
             layers.append(nn.Linear(hidden_size, hidden_size))  # Add a hidden linear layer
-            layers.append(Sine())  # Add an activation function (Tanh)
+            layers.append(nn.Tanh())  # Add an activation function (Tanh)
 
         # Output layer: Maps the final hidden layer outputs to the desired output size
         layers.append(nn.Linear(hidden_size, output_size))  # Add the final linear layer
