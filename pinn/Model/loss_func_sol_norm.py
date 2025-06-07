@@ -91,8 +91,9 @@ def kramp(temp,v1,v2,T_L,T_S):              # Function to calculate thermal cond
 def cp_ramp(temp,v1,v2,T_L,T_S):        # Function to calculate specific heat capacity in Mushy Zone
     slope = (v1-v2)/(T_L-T_S)
     cp_m = torch.where(temp > T_L, v1, torch.where(temp < T_S, v2, v2 + slope*(temp-T_S)))
-    
-    return cp_m
+    cp_max  = torch.maximum(v1, v2)
+    cp_s = cp_m / cp_max  # Normalizing specific heat capacity to maximum value
+    return cp_s
 
 def rho_ramp(temp,v1,v2,T_L,T_S):         # Function to calculate density in Mushy Zone
     slope = (v1-v2)/(T_L-T_S)
@@ -157,7 +158,8 @@ def pde_loss(model,x,t,T_S,T_L):
         T_range = temp_init - t_surr
         L_fusion_s = L_fusion_t / T_range
         delta_T = T_L_s - T_S_s
-        Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*delta_T)/ L_fusion_s
+        # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*delta_T)/ L_fusion_s
+        Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*(delta_T))
         return Ste
     
     
@@ -174,18 +176,18 @@ def pde_loss(model,x,t,T_S,T_L):
     if mask_l.any():
        alpha_l_s = alpha_l_t * (t[mask_l].view(-1) / (x[mask_l].view(-1)**2))
 
-       residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_s * u_xx[mask_l].view(-1) # Liquid phase
+       residual[mask_l] = u_t[mask_l].view(-1) -  u_xx[mask_l].view(-1) # Liquid phase
        
     if mask_s.any():
        alpha_s_s = alpha_s_t * (t[mask_s].view(-1) / (x[mask_s].view(-1)**2))
        
-       residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_s * u_xx[mask_s].view(-1) # Solid phase
+       residual[mask_s] = u_t[mask_s].view(-1) -  u_xx[mask_s].view(-1) # Solid phase
        
     if mask_m.any():
        c3 = (1+ 1/Ste(u_pred[mask_m]))
        alpha_m_s = alpha_m(u_pred[mask_m]) * (t[mask_m].view(-1) / (x[mask_m].view(-1)**2))
        
-       residual[mask_m] = u_t[mask_m].view(-1) - (alpha_m_s /c3) * u_xx[mask_m].view(-1) # Mushy phase
+       residual[mask_m] = u_t[mask_m].view(-1) - (1/c3) * u_xx[mask_m].view(-1) # Mushy phase
        
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
 
