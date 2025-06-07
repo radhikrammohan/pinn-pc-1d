@@ -17,6 +17,6 @@ module load python
 source ../../../pinn-1d/bin/activate
 
 
-python ../job_models/model_train_norm1.py --job_id $SLURM_JOB_ID 
+python ../model_train_norm3.py --job_id $SLURM_JOB_ID 
 
 
