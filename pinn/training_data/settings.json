@@ -38,7 +38,7 @@
 
   "epochs": 20000,
   "layers": 4,
-  "neurons": 8,
+  "neurons": 500,
   "learning_rate": 0.001,
   "pde_pts" : 25000,
   "ic_pts" : 40000,
