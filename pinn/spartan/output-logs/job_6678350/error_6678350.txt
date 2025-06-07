@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/jobs/../job_models/model_train_norm1.py", line 38, in <module>
+    with open(settings_path_1,'r') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/scratch3/ram128/pinn-pc-1d/pinn/spartan/job_models/../training_data/settings.json'
