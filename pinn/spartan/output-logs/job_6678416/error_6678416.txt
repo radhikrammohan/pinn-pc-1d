@@ -1,0 +1,1 @@
+python: can't open file '/scratch3/ram128/pinn-pc-1d/pinn/spartan/jobs/../model_train_norm4.py': [Errno 2] No such file or directory
