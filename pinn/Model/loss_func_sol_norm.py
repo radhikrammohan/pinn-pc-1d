@@ -249,8 +249,7 @@ def ic_loss(model,x,t,temp_ini):
     dome  = mag  * torch.sin(torch.pi * x)
     temp_i  = lin_temp + dome
     
-    print(f"u_pred.shape: {u_pred.shape}, temp_i shape: {temp_i.shape}")
-    print(f"u_pred.dtype: {u_pred.dtype}, temp_i dtype: {temp_i.dtype}")
+    
 
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))

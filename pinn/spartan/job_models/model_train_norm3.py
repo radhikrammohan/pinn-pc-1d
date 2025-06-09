@@ -333,7 +333,7 @@ hidden_layers = hidden_layers + 1
 hidden_size = hidden_size
 
 optimizer_used = optimizer_1
-train_file_used = "simdata_mush_dirc.py"  # Or dynamically fetched
+train_file_used = "simdata_mush_dirc_icc.py"  # Or dynamically fetched
 Model_file= os.path.basename(__file__)
 job_id = args.job_id
 
