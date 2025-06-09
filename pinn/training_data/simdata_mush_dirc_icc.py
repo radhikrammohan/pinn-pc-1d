@@ -75,7 +75,7 @@ class HT_sim():
         # self.tempfield = np.full(self.num_points, self.temp_init)            # Initial temperature of the rod with ghost points at both ends
                          # Initial temperature of the rod
         linpart = self.die_temp_l + (self.die_temp_r - self.die_temp_l) * np.linspace(0, self.length, self.num_points)
-        a = self.temp_init - self.die_temp_l
+        a = self.temp_init - ((self.die_temp_l + self.die_temp_r) / 2)
         dome = a * np.sin( (np.pi * np.linspace(0, self.length, self.num_points))/ self.length)
                                 # Index of the midpoint
         self.tempfield = linpart + dome 

@@ -229,7 +229,7 @@ def boundary_loss(model,x,t,t_surr,t_init):
    
     return bc_mean
 
-def ic_loss(model,x,t,temp_init):
+def ic_loss(model,x,t,temp_ini):
     
     u_pred = model(x,t)
     
@@ -242,9 +242,12 @@ def ic_loss(model,x,t,temp_init):
     # temp_i = torch.full_like(u_pred,temp_init)
 
     lin_temp = temp_l_s + (temp_l_s - temp_r_s) * x
-    mag = temp_init - temp_l_s
-    dome  = mag  * torch.sin( torch.pi * x)
+    
+    mag = temp_ini - (0.5*(temp_l_s +temp_r_s))
+    
+    dome  = mag  * torch.sin(torch.pi * x)
     temp_i  = lin_temp + dome
+    
 
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))
@@ -255,80 +258,4 @@ def accuracy(u_pred, u_true):
     return torch.mean(torch.abs(u_pred - u_true))
 
 
-def pde_resid(model,x,t,T_S,T_L):
-    # u_pred.requires_grad = True
-    x.requires_grad = True
-    t.requires_grad = True
-    
-    u_pred = model(x,t).to(device)
-    # u_pred  = model
-    
-    u_t = torch.autograd.grad(u_pred, t, 
-                                torch.ones_like(u_pred),
-                                create_graph=True,
-                                allow_unused=True,
-                                )[0] # Calculate the first time derivative
-    if u_t is None:
-        raise RuntimeError("u_t is None") # Check if u_t is None
 
-    u_x = torch.autograd.grad(u_pred, 
-                                x, 
-                                torch.ones_like(u_pred), 
-                                create_graph=True,
-                                allow_unused =True)[0] # Calculate the first space derivative
-
-    if u_x is None:
-        raise RuntimeError("u_x is None") # Check if u_x is None
-           
-    u_xx = torch.autograd.grad(u_x, 
-                                x, 
-                                torch.ones_like(u_x), 
-                                create_graph=True,
-                                allow_unused=True,
-                                materialize_grads=True)[0]
-    
-    if u_xx is None:
-        raise RuntimeError("u_xx is None") # Check if u_xx is None
-
-    # T_S_tensor = T_S.clone().detach().to(device)
-    # T_L_tensor = T_L.clone().detach().to(device)
-    
-    mask_l = u_pred > T_L
-    mask_s = u_pred < T_S
-    mask_m = (u_pred <= T_L) & (u_pred >= T_S)
-
-
-    # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*(T_Lt- T_St))/ L_fusion_t
-
-    def Ste(u_pred):
-        Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*(T_Lt- T_St))/ L_fusion_t
-        return Ste
-    
-    
-    
-    def alpha_m(u_pred):
-        alpha_m = kramp(u_pred,k_l_t,k_s_t,T_L_s,T_S_s) \
-            / (rho_ramp(u_pred,rho_l_t,rho_s_t,T_L_s,T_S_s) \
-                * cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)) 
-        return alpha_m
-   
-    
-    residual = torch.zeros_like(u_pred).to(device)
-    
-   
-    if mask_l.any():
-        residual[mask_l] = u_t[mask_l].view(-1) - alpha_l_t * u_xx[mask_l].view(-1) # Liquid phase
-        # print("Liquid phase residual calculated")
-    if mask_s.any():
-        residual[mask_s] = u_t[mask_s].view(-1) - alpha_s_t * u_xx[mask_s].view(-1) # Solid phase
-        # print("Solid phase residual calculated")
-    if mask_m.any():
-        c3 = (1+ 1/Ste(u_pred[mask_m]))
-        residual[mask_m] = u_t[mask_m].view(-1) - (alpha_m(u_pred[mask_m]) /c3) * u_xx[mask_m].view(-1) # Mushy phase
-        # print("Mushy phase residual calculated")
-
-    # residual = u_t - (u_xx) # Calculate the residual of the PDE
-   
-    
-    
-    return residual

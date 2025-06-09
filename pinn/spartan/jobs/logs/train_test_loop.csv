@@ -1,1 +1,0 @@
-epoch,train_loss,test_loss,data_loss,pde_loss,ic_loss,bc_loss,data_loss_test,pde_loss_test,ic_loss_test,bc_loss_test

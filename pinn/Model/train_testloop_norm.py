@@ -8,18 +8,18 @@ from torch.optim import Adam
 from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
 
 
-from logger_config import setup_logger
+# from logger_config import setup_logger
 import random
 import time
 import csv
 
-logger =setup_logger('train_test_loop', '../logs/train_test_loop_norm.csv')
+# logger =setup_logger('train_test_loop', '../logs/train_test_loop_norm.csv')
 
-with open('logs/train_test_loop.csv', 'w', newline='') as f:
-    writer = csv.writer(f)
-    # Write the header row
-    writer.writerow(['epoch', 'train_loss', 'test_loss', 'data_loss', 'pde_loss', 'ic_loss', 'bc_loss',
-                     'data_loss_test', 'pde_loss_test', 'ic_loss_test', 'bc_loss_test'])
+# with open('logs/train_test_loop.csv', 'w', newline='') as f:
+#     writer = csv.writer(f)
+#     # Write the header row
+#     writer.writerow(['epoch', 'train_loss', 'test_loss', 'data_loss', 'pde_loss', 'ic_loss', 'bc_loss',
+#                      'data_loss_test', 'pde_loss_test', 'ic_loss_test', 'bc_loss_test'])
 
 # check for gpu
 if torch.backends.mps.is_available():
@@ -112,12 +112,12 @@ def training_loop(epochs, model, \
             data_loss = loss_fn_data(u_pred_d, temp_inp)  # Data loss
             
             # Forward pass for initial condition prediction
-            u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
+            # u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
             init_loss = ic_loss(model,inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1),temp_init_t)  # Initial condition loss
             
             # Forward pass for boundary conditions
-            u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
-            u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
+            # u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
+            # u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
             
             # Boundary condition loss (left and right)
             bc_loss_left = boundary_loss(model, inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1), die_temp_l,temp_init_t)
@@ -141,12 +141,12 @@ def training_loop(epochs, model, \
                 data_loss = loss_fn_data(u_pred_d, temp_inp)  # Data loss
                 
                 # Forward pass for initial condition prediction
-                u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
+                # u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
                 init_loss = ic_loss(model,inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1),temp_init_t)  # Initial condition loss
                 
                 # Forward pass for boundary conditions
-                u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
-                u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
+                # u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
+                # u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
                 
                 # Boundary condition loss (left and right)
                 bc_loss_left = boundary_loss(model, inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1), die_temp_l,temp_init_t)
@@ -216,11 +216,11 @@ def training_loop(epochs, model, \
             u_pred = model(inputs[:, 0].unsqueeze(1), inputs[:, 1].unsqueeze(1))
             data_loss_t = loss_fn_data(u_pred, temp_inp)
             
-            u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
+            # u_initl = model(inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1))
             init_loss_t = ic_loss(model,inputs_init[:, 0].unsqueeze(1), inputs_init[:, 1].unsqueeze(1),temp_init_t)
             
-            u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
-            u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
+            # u_left = model(inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1))
+            # u_right = model(inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1))
             
             bc_loss_left_t = boundary_loss(model, inputs_left[:, 0].unsqueeze(1), inputs_left[:, 1].unsqueeze(1),die_temp_l,temp_init_t)
             bc_loss_right_t = boundary_loss(model, inputs_right[:, 0].unsqueeze(1), inputs_right[:, 1].unsqueeze(1),die_temp_r,temp_init_t)
@@ -294,9 +294,9 @@ def training_loop(epochs, model, \
     # Return all collected losses for further analysis
     # return train_losses, test_losses, pde_losses, bc_losses, ic_losses, data_losses
     
-        logger.info(f"{epoch+1}, {train_loss:.4e}, {test_loss:.4e}, {data_loss_b:.4e}, \
-            {phy_loss_acc:.4e}, {init_loss_acc:.4e}, {bc_loss_acc:.4e}, {data_loss_t:.4e}, \
-                {phy_loss_t:.4e}, {ic_loss_t:.4e}, {bc_l_loss_t:.4e}")
+        # logger.info(f"{epoch+1}, {train_loss:.4e}, {test_loss:.4e}, {data_loss_b:.4e}, \
+        #     {phy_loss_acc:.4e}, {init_loss_acc:.4e}, {bc_loss_acc:.4e}, {data_loss_t:.4e}, \
+        #         {phy_loss_t:.4e}, {ic_loss_t:.4e}, {bc_l_loss_t:.4e}")
     return loss_train, loss_test, best_model
 
 
