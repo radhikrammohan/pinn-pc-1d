@@ -117,7 +117,7 @@ def l1_regularization(model, lambd):
     l1_reg = sum(param.abs().sum() for param in model.parameters())
     return l1_reg * lambd
 
-def pde_loss(model,x,t,T_S,T_L):
+def pde_loss(model,x,t,a,b):
     # u_pred.requires_grad = True
     x.requires_grad = True
     t.requires_grad = True
@@ -154,10 +154,10 @@ def pde_loss(model,x,t,T_S,T_L):
 
     # T_S_tensor = T_S.clone().detach().to(device)
     # T_L_tensor = T_L.clone().detach().to(device)
-    
-    mask_l = u_pred > T_L
-    mask_s = u_pred < T_S
-    mask_m = (u_pred <= T_L) & (u_pred >= T_S)
+    # print(f"a-T_s: {a}, b-T_L: {b}")
+    mask_l = u_pred > b
+    mask_s = u_pred < a
+    mask_m = (u_pred <= b) & (u_pred > a)
     
     
     # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
@@ -165,7 +165,7 @@ def pde_loss(model,x,t,T_S,T_L):
     def Ste(u_pred):
         T_range = temp_init - t_surr
         L_fusion_s = L_fusion_t / T_range
-        delta_T = T_L_s - T_S_s
+        delta_T = b - a
         # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*delta_T)/ L_fusion_s
         Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*(delta_T))
         return Ste
@@ -223,6 +223,7 @@ def boundary_loss(model,x,t,t_surr,t_init):
     # bc_mean =  torch.mean(torch.square(u_pred-bc_cal))
     # print(f"Boundary condition loss calculated: {u_pred.mean():.6f}")
     t_surr_c = torch.full_like(u_pred, t_surr)
+    
     bc_mean =  torch.mean(torch.square(u_pred-t_surr_c))
     # bc_mean =  torch.mean(torch.square(u_pred-bc))
     # bc_mean = nn.MSELoss()(u_pred,bc)
@@ -248,6 +249,8 @@ def ic_loss(model,x,t,temp_ini):
     dome  = mag  * torch.sin(torch.pi * x)
     temp_i  = lin_temp + dome
     
+    print(f"u_pred.shape: {u_pred.shape}, temp_i shape: {temp_i.shape}")
+    print(f"u_pred.dtype: {u_pred.dtype}, temp_i dtype: {temp_i.dtype}")
 
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))

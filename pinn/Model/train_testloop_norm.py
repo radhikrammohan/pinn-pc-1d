@@ -55,6 +55,7 @@ def training_loop(epochs, model, \
     
 
     T_st = temp_var["T_st"]
+    
     T_lt = temp_var["T_lt"]
     t_surrt = temp_var["t_surrt"]
     die_temp_l = temp_var["die_temp_l"]
