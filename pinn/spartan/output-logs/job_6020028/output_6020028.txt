@@ -1,0 +1,18 @@
+Using device: cuda
+Using device: cuda
+Using device: cuda
+The spatial step is 0.0003061224489795918
+The time step is 0.000330226858600583
+scaling not initiated
+The number of points in the PDE input is 25000
+scaling not initiated
+The number of points in the PDE input is 25000
+The number of points in the initial condition is 25000
+scaling not initiated
+The number of points in the left boundary condition is 25000
+The number of points in the right boundary condition is 25000
+scaling not initiated
+The number of points in the left boundary condition is 25000
+The number of points in the right boundary condition is 25000
+scaling not initiated
+Using device: cuda

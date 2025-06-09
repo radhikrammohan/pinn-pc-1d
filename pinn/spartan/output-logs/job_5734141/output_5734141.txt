@@ -1,0 +1,59 @@
+Using device: cuda
+Using device: cuda
+Using device: cuda
+The spatial step is 0.00020408163265306123
+The time step is 0.00014676749271137028
+scaling initated
+The number of points in the PDE input is 20000
+The number of points in the initial condition is 20000
+scaling not initiated
+The number of points in the left boundary condition is 20000
+The number of points in the right boundary condition is 20000
+scaling not initiated
+The number of points in the left boundary condition is 20000
+The number of points in the right boundary condition is 20000
+scaling not initiated
+Using device: cuda
+ 
+----------------------------------------------------------------------------------------------------
+| Epoch 1,            | Training-Loss 3.6358e+07,| Test-Loss 3.5738e+07   |
+----------------------------------------------------------------------------------------------------
+| Data-loss 6.5483e+05,| pde-loss 4.1888e+00,| initc-loss 8.1482e+05,|bc_loss 7.9340e+04|
+----------------------------------------------------------------------------------------------------
+| Data-loss-test 1.3404e+06,| pde-loss-test 2.5171e-14,| initc-loss-test 8.1429e+05,|bc_loss-test 7.9174e+04|
+----------------------------------------------------------------------------------------------------
+ 
+ 
+----------------------------------------------------------------------------------------------------
+| Epoch 2,            | Training-Loss 3.5203e+07,| Test-Loss 3.4651e+07   |
+----------------------------------------------------------------------------------------------------
+| Data-loss 6.3432e+05,| pde-loss 1.1941e-13,| initc-loss 7.9400e+05,|bc_loss 7.2937e+04|
+----------------------------------------------------------------------------------------------------
+| Data-loss-test 1.2726e+06,| pde-loss-test 5.1242e-15,| initc-loss-test 7.9349e+05,|bc_loss-test 7.2783e+04|
+----------------------------------------------------------------------------------------------------
+ 
+ 
+----------------------------------------------------------------------------------------------------
+| Epoch 1,            | Training-Loss 3.4143e+07,| Test-Loss 3.3615e+07   |
+----------------------------------------------------------------------------------------------------
+| Data-loss 6.1679e+05,| pde-loss 3.1219e-14,| initc-loss 7.7404e+05,|bc_loss 6.6976e+04|
+----------------------------------------------------------------------------------------------------
+| Data-loss-test 1.2278e+06,| pde-loss-test 8.0545e-16,| initc-loss-test 7.7355e+05,|bc_loss-test 6.6832e+04|
+----------------------------------------------------------------------------------------------------
+ 
+ 
+----------------------------------------------------------------------------------------------------
+| Epoch 2,            | Training-Loss 3.3126e+07,| Test-Loss 3.2618e+07   |
+----------------------------------------------------------------------------------------------------
+| Data-loss 5.9709e+05,| pde-loss 2.3906e-15,| initc-loss 7.5470e+05,|bc_loss 6.1371e+04|
+----------------------------------------------------------------------------------------------------
+| Data-loss-test 1.2159e+06,| pde-loss-test 1.0979e-17,| initc-loss-test 7.5422e+05,|bc_loss-test 6.1235e+04|
+----------------------------------------------------------------------------------------------------
+ 
+Created root output directory: output_files
+Saving outputs to: output_files/job_5734141
+Job summary saved at: output_files/job_5734141/job_summary.txt
+Training loss saved at: output_files/job_5734141/train-loss.pkl
+Testing loss saved at: output_files/job_5734141/test-loss.pkl
+Training complete
+Model Architecture: 30 x 10, Learning Rate: 0.009, Activation: Tanh, Optimizer: Adam

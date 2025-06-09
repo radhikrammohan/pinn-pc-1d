@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/scratch3/ram128/pinn-pc-1d/pinn/spartan/jobs/../model_train_norm.py", line 35, in <module>
+    from simdata_mush_dirc import  *
+ModuleNotFoundError: No module named 'simdata_mush_dirc'
