@@ -79,6 +79,14 @@ T_S_s = temp_scaler(T_St, temp_init, t_surr)  # Scaled Solidus Temperature
 T_Lt = torch.tensor(props['T_L'] ,dtype=torch.float32,device=device) #  K -Liquidus Temperature (615 c) AL 380
 T_L_s = temp_scaler(T_Lt, temp_init, t_surr)  # Scaled Liquidus Temperature
 
+temp_l = props['die_temp_l']  # Left boundary temperature (K)
+temp_r = props['die_temp_r']  # Right boundary temperature (K)
+
+temp_l_s = temp_scaler(torch.tensor(temp_l, dtype=torch.float32, device=device), temp_init, t_surr)  # Scaled Left Boundary Temperature
+temp_r_s = temp_scaler(torch.tensor(temp_r, dtype=torch.float32, device=device), temp_init, t_surr)  # Scaled Right Boundary Temperature
+length = props['length']  # Length of the die (m)
+length_s = torch.tensor(length, dtype=torch.float32, device=device)  # Scaled Length of the die
+
 
 def kramp(temp,v1,v2,T_L,T_S):              # Function to calculate thermal conductivity in Mushy Zone
     slope = (v1-v2)/(T_L-T_S)
@@ -231,8 +239,13 @@ def ic_loss(model,x,t,temp_init):
     # u_ic = ic_func(x,t,temp_init)
     
     # # u_del = u_pred - temp_init
-    temp_i = torch.full_like(u_pred,temp_init)
-   
+    # temp_i = torch.full_like(u_pred,temp_init)
+
+    lin_temp = temp_l_s + (temp_l_s - temp_r_s) * x
+    mag = temp_init - temp_l_s
+    dome  = mag  * torch.sin( torch.pi * x)
+    temp_i  = lin_temp + dome
+
     # ic_mean = nn.MSELoss()(u_pred,temp_i)    
     ic_mean = torch.mean(torch.square(u_pred-temp_i))
     # print(f"Initial condition loss calculated: {u_pred.mean():.6f}")

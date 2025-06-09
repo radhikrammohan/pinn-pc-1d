@@ -1,6 +1,6 @@
 {
   "length": 15.0e-3,
-  "time_end": 5.0,
+  "time_end": 7.0,
   "num_points":50,
   "t_surr": 298.0,
   "temp_init":919.0,
@@ -36,11 +36,11 @@
   "model_k_path": "model_k.joblib",
   "model_cp_path": "model_cp.joblib",
 
-  "epochs": 20000,
+  "epochs": 10000,
   "layers": 4,
-  "neurons": 500,
+  "neurons": 80,
   "learning_rate": 0.001,
   "pde_pts" : 25000,
-  "ic_pts" : 40000,
-  "bc_pts" :40000
+  "ic_pts" : 20000,
+  "bc_pts" :20000
 }
