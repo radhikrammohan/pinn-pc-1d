@@ -56,8 +56,9 @@ alpha_l_t = k_l_t / (rho_l_t * cp_l_t)
 
 alpha_s_t = k_s_t / (rho_s_t*cp_s_t)
 alpha_s_t = alpha_s_t.clone().detach().to(dtype=torch.float32, device=device)
+alpha_max = torch.max(alpha_l_t, alpha_s_t)  # Thermal diffusivity in maximum
 
-# # alpha_m = k_m / (rho_m * cp_m)          #`Thermal diffusivity in mushy zone is taken as average of liquid and solid thermal diffusivity`
+# # alpha_m = k_m / (rho_m * cp_m)          # Thermal diffusivity in mushy zone is taken as average of liquid and solid thermal diffusivity
 
 L_fusion_t = torch.tensor(props['L_fusion'],dtype=torch.float32,device=device) # J/kg  # Latent heat of fusion of aluminum
 #          # Thermal diffusivity
@@ -90,23 +91,26 @@ length_s = torch.tensor(length, dtype=torch.float32, device=device)  # Scaled Le
 
 def kramp(temp,v1,v2,T_L,T_S):              # Function to calculate thermal conductivity in Mushy Zone
     slope = (v1-v2)/(T_L-T_S)
-    
-    k_m = torch.where(temp > T_L, v1, torch.where(temp < T_S, v2, v2 + slope*(temp-T_S)))
-    
-        
+    T_range = temp_init - t_surr
+    T = temp * T_range + t_surr  # Scale the predicted temperature back to original range
+    k_m = torch.where(T > T_L, v1, torch.where(T < T_S, v2, v2 + slope*(T-T_S)))
     return k_m
 
 def cp_ramp(temp,v1,v2,T_L,T_S):        # Function to calculate specific heat capacity in Mushy Zone
     slope = (v1-v2)/(T_L-T_S)
-    cp_m = torch.where(temp > T_L, v1, torch.where(temp < T_S, v2, v2 + slope*(temp-T_S)))
-    cp_max  = torch.maximum(v1, v2)
-    cp_s = cp_m / cp_max  # Normalizing specific heat capacity to maximum value
-    return cp_s
+    T_range = temp_init - t_surr
+    T = temp * T_range + t_surr  # Scale the predicted temperature back to original range
+    cp_m = torch.where(T > T_L, v1, torch.where(T < T_S, v2, v2 + slope*(T-T_S)))
+    # cp_max  = torch.maximum(v1, v2)
+    # cp_s = cp_m / cp_max  # Normalizing specific heat capacity to maximum value
+    return cp_m
 
 def rho_ramp(temp,v1,v2,T_L,T_S):         # Function to calculate density in Mushy Zone
     slope = (v1-v2)/(T_L-T_S)
-    rho_m = torch.where(temp > T_L, v1, torch.where(temp < T_S, v2, v2 + slope*(temp-T_S)))
-    
+    T_range = temp_init - t_surr
+    T = temp * T_range + t_surr  # Scale the predicted temperature back to original range
+    rho_m = torch.where(T > T_L, v1, torch.where(T < T_S, v2, v2 + slope*(T-T_S)))
+
     return rho_m
 
 
@@ -117,6 +121,23 @@ def l1_regularization(model, lambd):
     l1_reg = sum(param.abs().sum() for param in model.parameters())
     return l1_reg * lambd
 
+
+def Ste(u_pred):
+        T_range = temp_init - t_surr
+        T = u_pred * T_range + t_surr  # Scale the predicted temperature back to original range
+        
+        delta_T = torch.abs(T_Lt - T_St)  # Difference between liquidus and solidus temperatures
+        # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*delta_T)/ L_fusion_s
+        Ste = (cp_ramp(T,cp_l_t,cp_s_t,T_Lt,T_St)*(delta_T)) /L_fusion_t
+        return Ste
+    
+def alpha_m(u_pred):
+        alpha_m = kramp(u_pred,k_l_t,k_s_t,T_Lt,T_St) \
+            / (rho_ramp(u_pred,rho_l_t,rho_s_t,T_Lt,T_St) \
+                * cp_ramp(u_pred,cp_l_t,cp_s_t,T_Lt,T_St)) 
+        return alpha_m
+      
+    
 def pde_loss(model,x,t,a,b):
     # u_pred.requires_grad = True
     x.requires_grad = True
@@ -155,48 +176,35 @@ def pde_loss(model,x,t,a,b):
     # T_S_tensor = T_S.clone().detach().to(device)
     # T_L_tensor = T_L.clone().detach().to(device)
     # print(f"a-T_s: {a}, b-T_L: {b}")
-    mask_l = u_pred > b
-    mask_s = u_pred < a
-    mask_m = (u_pred <= b) & (u_pred > a)
+    mask_l = u_pred >= b
+    mask_s = u_pred <= a
+    mask_m = (u_pred < b) & (u_pred > a)
+
     
-    
-    # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L,T_S)*(T_Lt- T_St) )/ L_fusion_t
-    
-    def Ste(u_pred):
-        T_range = temp_init - t_surr
-        L_fusion_s = L_fusion_t / T_range
-        delta_T = b - a
-        # Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*delta_T)/ L_fusion_s
-        Ste = (cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)*(delta_T))
-        return Ste
-    
-    
-    
-    def alpha_m(u_pred):
-        alpha_m = kramp(u_pred,k_l_t,k_s_t,T_L_s,T_S_s) \
-            / (rho_ramp(u_pred,rho_l_t,rho_s_t,T_L_s,T_S_s) \
-                * cp_ramp(u_pred,cp_l_t,cp_s_t,T_L_s,T_S_s)) 
-        return alpha_m
    
     
-    residual = torch.zeros_like(u_pred).to(device)
+    residual = torch.zeros_like(u_pred).to(device) # Initialize the residual tensor
     
     if mask_l.any():
-       alpha_l_s = alpha_l_t * (t[mask_l].view(-1) / (x[mask_l].view(-1)**2))
-
-       residual[mask_l] = u_t[mask_l].view(-1) -  u_xx[mask_l].view(-1) # Liquid phase
+    #    alpha_l_s = alpha_l_t * (t[mask_l].view(-1) / (x[mask_l].view(-1)**2))
+       alpha_rl = alpha_l_t / alpha_max
+       
+       residual[mask_l] = u_t[mask_l].view(-1) - (alpha_rl * u_xx[mask_l].view(-1)) # Liquid phase
        
     if mask_s.any():
-       alpha_s_s = alpha_s_t * (t[mask_s].view(-1) / (x[mask_s].view(-1)**2))
+    #    alpha_s_s = alpha_s_t * (t[mask_s].view(-1) / (x[mask_s].view(-1)**2))
+       alpha_rs = alpha_s_t / alpha_max
        
-       residual[mask_s] = u_t[mask_s].view(-1) -  u_xx[mask_s].view(-1) # Solid phase
+       residual[mask_s] = u_t[mask_s].view(-1) - ( alpha_rs * u_xx[mask_s].view(-1)) # Solid phase
        
     if mask_m.any():
        c3 = (1+ 1/Ste(u_pred[mask_m]))
-       alpha_m_s = alpha_m(u_pred[mask_m]) * (t[mask_m].view(-1) / (x[mask_m].view(-1)**2))
        
-       residual[mask_m] = u_t[mask_m].view(-1) - (1/c3) * u_xx[mask_m].view(-1) # Mushy phase
+    #    alpha_m_s = alpha_m(u_pred[mask_m]) * (t[mask_m].view(-1) / (x[mask_m].view(-1)**2))
+       alpha_rm = alpha_m(u_pred[mask_m]) / alpha_max
        
+       residual[mask_m] = u_t[mask_m].view(-1) - (alpha_rm/c3) * u_xx[mask_m].view(-1) # Mushy phase
+
     # residual = u_t - (u_xx) # Calculate the residual of the PDE
 
     resid_mean = torch.mean(torch.square(residual))

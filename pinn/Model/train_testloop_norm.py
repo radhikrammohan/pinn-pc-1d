@@ -274,11 +274,11 @@ def training_loop(epochs, model, \
         if epoch % 10 == 0:
             print(f" ")
             print(f"--"*50)
-            print(f"| Epoch {epoch+1},            | Training-Loss {train_loss:.4e},| Test-Loss {test_loss:.4e}   |")
+            print(f"| Epoch {epoch+1},            | Training-Loss {train_loss/len(train_dataloader):.4e},| Test-Loss {test_loss/len(test_dataloader):.4e}   |")
             print(f"--"*50)
-            print(f"| Data-loss {data_loss:.4e},| pde-loss {phy_loss_acc:.4e},| initc-loss {init_loss:.4e},|bc_loss {bc_loss:.4e}|") 
+            print(f"| Data-loss {data_loss/len(train_dataloader):.4e},| pde-loss {phy_loss_acc /len(train_dataloader):.4e},| initc-loss {init_loss/len(train_dataloader):.4e},|bc_loss {bc_loss/len(train_dataloader):.4e}|") 
             print(f"--"*50)
-            print(f"| Data-loss-test {data_loss_t:.4e},| pde-loss-test {phy_loss_t:.4e},| initc-loss-test {init_loss_t:.4e},|bc_loss-test {bc_loss_t:.4e}|")
+            print(f"| Data-loss-test {data_loss_t/len(test_dataloader):.4e},| pde-loss-test {phy_loss_t/len(test_dataloader):.4e},| initc-loss-test {init_loss_t/len(test_dataloader):.4e},|bc_loss-test {bc_loss_t/len(test_dataloader):.4e}|")
             print(f"--"*50)
             print(f" ")
 
@@ -287,9 +287,9 @@ def training_loop(epochs, model, \
             print(f"--"*50)
             print(f"| Epoch {epoch+1},            | Training-Loss {train_loss:.4e},| Test-Loss {test_loss:.4e}   |")
             print(f"--"*50)
-            print(f"| Data-loss {data_loss:.4e},| pde-loss {phy_loss_acc:.4e},| initc-loss {init_loss:.4e},|bc_loss {bc_loss:.4e}|") 
+            print(f"| Data-loss {data_loss /len(train_dataloader):.4e},| pde-loss {phy_loss_acc /len(train_dataloader):.4e},| initc-loss {init_loss /len(train_dataloader):.4e},|bc_loss {bc_loss /len(train_dataloader):.4e}|") 
             print(f"--"*50)
-            print(f"| Data-loss-test {data_loss_t:.4e},| pde-loss-test {phy_loss_t:.4e},| initc-loss-test {init_loss_t:.4e},|bc_loss-test {bc_loss_t:.4e}|")
+            print(f"| Data-loss-test {data_loss_t /len(test_dataloader):.4e},| pde-loss-test {phy_loss_t /len(test_dataloader):.4e},| initc-loss-test {init_loss_t /len(test_dataloader):.4e},|bc_loss-test {bc_loss_t /len(test_dataloader):.4e}|")
             print(f"--"*50)
             print(f" ")
     # Return all collected losses for further analysis

@@ -170,12 +170,11 @@ class HT_sim():
             tempfield[-1] = self.die_temp_r
             for n in range(1,self.num_points-1):              # space loop, adjusted range
                 
-                if tempfield[n] > self.T_L:  # Liquid phase
+                if tempfield[n] >= self.T_L:  # Liquid phase
                     tempfield[n] += ((self.alpha_l * self.step_coeff) * (temp_int[n+1] \
                         - (2.0 * temp_int[n]) + temp_int[n-1]))
-                    
-                elif self.T_L >= tempfield[n] > self.T_S:  # Mushy phase
-                    
+                elif self.T_L > tempfield[n] > self.T_S:  # Mushy phase
+
                     k_m = self.kramp(tempfield[n], self.k_l, self.k_s, self.T_L, self.T_S)
                     cp_m = self.cp_ramp(tempfield[n], self.cp_l, self.cp_s, self.T_L, self.T_S)
                     rho_m = self.rho_ramp(tempfield[n], self.rho_l, self.rho_s, self.T_L, self.T_S)
