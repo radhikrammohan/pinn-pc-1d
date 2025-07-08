@@ -127,8 +127,18 @@ def training_loop(epochs, model, \
             # Calculate individual losses
             phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
 
+            w0, w1, w2, w3 = 1, 1, 1, 1
+            # Adjust weights dynamically at epoch 500
+            # This is a simple example; you can implement more complex logic based on your requirement
+
+            if epoch !=0 and epoch % 100 == 0:
+               w0 = data_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               w1 = pde_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               w2 = ic_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               w3 = bc_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               print(f"train w0: {w0}, w1: {w1}, w2: {w2}, w3: {w3}")
             # Define weights for the different losses
-            w0, w1, w2, w3 = 1, 1, 100, 100
+            # w0, w1, w2, w3 = 1, 1, 100, 100
             # Calculate total loss
             # loss = data_loss 
             loss =  w1 * phy_loss + w2 * init_loss + w3 * bc_loss
@@ -229,8 +239,15 @@ def training_loop(epochs, model, \
             
             phy_loss_t = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)
             
-            w0, w1, w2, w3 = 1,1,100,100
+            w0, w1, w2, w3 = 1,1,1,1
             # loss_t =  data_loss_t 
+            
+            if epoch !=0 and epoch % 100 == 0:
+               w0 = data_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               w1 = pde_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               w2 = ic_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               w3 = bc_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
+               print(f"w0: {w0}, w1: {w1}, w2: {w2}, w3: {w3}")
             loss_t = w1 * phy_loss_t + w2 * init_loss_t + w3 * bc_loss_t
 
             test_loss += loss_t.item()

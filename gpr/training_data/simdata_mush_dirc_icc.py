@@ -83,9 +83,9 @@ class HT_sim():
                                                                    # die thickness in m
         # Calculate dx,dt, and step_coeff
         self.dx = self.dx_calc(self.length, self.num_points)
-        print("The spatial step is", self.dx)
+        # print("The spatial step is", self.dx)
         self.dt = self.dt_calc(self.dx, self.alpha_l, self.alpha_s, self.alpha_m)
-        print("The time step is", self.dt)
+        # print("The time step is", self.dt)
         self.step_coeff = self.step_coeff_calc(self.dt, self.dx)
         self.num_steps = round(self.time_end/self.dt)
 
@@ -395,3 +395,37 @@ def invscaler(data, min_d, max_d):
     # Inverse scaling to bring the data back to original scale
     invsc_data = data*(max_d-min_d) + min_d
     return invsc_data
+
+def temp_at_pt(sim_obj, x_target, t_target):
+    """
+    Extract the temperature at a specific space-time point from the simulation result.
+
+    Parameters:
+    - sim_obj: instance of HT_sim after running datagen()
+    - x_target: target spatial location (in meters)
+    - t_target: target time (in seconds)
+
+    Returns:
+    - temperature at (x_target, t_target)
+    """
+
+    # # Safety check
+    # if not hasattr(sim_obj, "temp_history_1"):
+    #     raise ValueError("Run sim_obj.datagen() before calling this function.")
+    
+    # Compute spatial and temporal resolution
+    dx = sim_obj.dx
+    dt = sim_obj.dt
+
+    # Convert target x, t into nearest index
+    x_idx = int(np.round(x_target / dx))
+    t_idx = int(np.round(t_target / dt))
+
+    # Boundary checks
+    if x_idx < 0 or x_idx >= sim_obj.num_points:
+        raise IndexError("x_target is outside the spatial domain.")
+    if t_idx < 0 or t_idx > sim_obj.num_steps:
+        raise IndexError("t_target is outside the temporal domain.")
+    temp_history_1 = sim_obj.datagen()
+    # Extract and return the temperature
+    return sim_obj.temp_history_1[t_idx, x_idx]

@@ -31,7 +31,7 @@ sys.path.insert(0,str(model_dir))
 
 from simdata_mush_dirc_icc import  *
 from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
-from Model.train_testloop_norm import *
+from Model.train_testloop_wbal import *
 
 
 settings_path_1 = os.path.join(current_dir, '../..', 'training_data', 'settings2.json')
