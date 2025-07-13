@@ -1,0 +1,17 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"python"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "python"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+/var/spool/slurm/job12591147/slurm_script: line 19: ../../../pinn-1d/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/simple-nn/spartan/jobs/model_train.py", line 20, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'

@@ -44,26 +44,22 @@ torch.manual_seed(1234)
 
 # %%
 # import .csv dataset 
-file_path = "../../data/heat_data_mushy.csv"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_dir, "..","..","gpr","training_data","paramteric_dataset","simulated_dataset.csv")
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"File not found at: {file_path}")
 temp1 = pd.read_csv(file_path)
 
 temp2=temp1.copy()
 
-a = temp2.shape[0]
 
-pp1 = np.random.uniform(low=2,high=10,size=a)
-
-temp2['pp1']= pp1
-temp2['modtemp'] = temp2['temp']* temp2['pp1']
-
-
-temp3 = temp2.copy()
-cols = ['x', 't', 'pp1','modtemp']
+cols = ['x', 't', 'L_fusion','die_temp_l', 'die_temp_r', 'temp']
 scalers = {}
 for col in cols:
     scaler = MinMaxScaler()
-    temp3[col] = scaler.fit_transform(temp3[[col]])
+    temp2[col] = scaler.fit_transform(temp2[[col]])
     scalers[col] = scaler
+
 
 # Parse arguments
 parser = argparse.ArgumentParser()
@@ -81,16 +77,16 @@ with open(scaler_file, 'wb') as f:
 # %%
 # Dataset Preparation
 
-feature_columns = ['x','t','pp1']
-target_column = 'modtemp'
+feature_columns = ['x','t','L_fusion','die_temp_l', 'die_temp_r']
+target_column = 'temp'
 
-train_dataset = Cus_Dataset(temp3,feature_columns,target_column,train_ratio=0.8,\
+train_dataset = Cus_Dataset(temp2,feature_columns,target_column,train_ratio=0.8,\
                                    test_ratio=0.1, val_ratio=0.1,split='train')
 
-val_dataset = Cus_Dataset(temp3,feature_columns,target_column,train_ratio=0.8,\
+val_dataset = Cus_Dataset(temp2,feature_columns,target_column,train_ratio=0.8,\
                                    test_ratio=0.1, val_ratio=0.1,split='val')
 
-test_dataset = Cus_Dataset(temp3,feature_columns,target_column,train_ratio=0.8,\
+test_dataset = Cus_Dataset(temp2,feature_columns,target_column,train_ratio=0.8,\
                                    test_ratio=0.1, val_ratio=0.1,split='test')
 
 
@@ -116,14 +112,14 @@ else:
 print('Using device:', device)
 
 # %%
-input_size = 3
-hidden_size = 10
+input_size = 5
+hidden_size = 20
 output_size = 1
 
 learning_rate = 0.005
 hidden_layers = 5
 
-epochs= 3000
+epochs= 10000
 
 model = SimpleNN(input_size,hidden_size,output_size,hidden_layers)
 optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate)

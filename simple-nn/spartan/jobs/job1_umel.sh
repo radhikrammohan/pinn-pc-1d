@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=1d-pinn
+#SBATCH --job-name="1d-pinn-paramteric"
 #SBATCH --output=../output-logs/job_%j/output_%j.txt
 #SBATCH --error=../output-logs/job_%j/error_%j.txt
 #SBATCH --time=23:55:00
@@ -7,8 +7,10 @@
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
+#SBATCH --partition=gpu-a100
 #SBATCH --gres=gpu:1
-#SBATCH --account=OD-217410
+#SBATCH --account="punim2143"
+
 
 # Define the timestamp format
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
@@ -17,6 +19,6 @@ module load python
 source ../../../pinn-1d/bin/activate
 
 
-python ../job_models/model_train_wbal.py --job_id $SLURM_JOB_ID 
+python model_train.py --job_id $SLURM_JOB_ID 
 
 

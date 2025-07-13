@@ -1,12 +1,17 @@
 import time
+import os
 from itertools import zip_longest
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, RandomSampler
 from torch.optim import Adam
 
-from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
+os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'  # Set CUBLAS workspace config for better performance
+torch.use_deterministic_algorithms(True)  # Ensure deterministic behavior
 
+from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
+from Model.gradnorm_up import GradNormLoss
 
 # from logger_config import setup_logger
 import random
@@ -63,7 +68,7 @@ def training_loop(epochs, model, \
     temp_init_t = temp_var["temp_init_t"]
     
     model.to(device)  # Move the model to the GPU
-    
+    grad_norm = GradNormLoss(model, num_tasks=3, alpha=1.5, apply_every=100)  # Initialize GradNorm loss
     for epoch in range(epochs):
         
         model.train()  # Set the model to training mode
@@ -127,23 +132,14 @@ def training_loop(epochs, model, \
             # Calculate individual losses
             phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
 
-            w0, w1, w2, w3 = 1, 1, 1, 1
-            # Adjust weights dynamically at epoch 500
-            # This is a simple example; you can implement more complex logic based on your requirement
-
-            if epoch !=0 and epoch % 100 == 0:
-               w0 = data_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               w1 = pde_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               w2 = ic_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               w3 = bc_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               print(f"train w0: {w0}, w1: {w1}, w2: {w2}, w3: {w3}")
-            # Define weights for the different losses
-            # w0, w1, w2, w3 = 1, 1, 100, 100
-            # Calculate total loss
-            # loss = data_loss 
-            loss =  w1 * phy_loss + w2 * init_loss + w3 * bc_loss
+            
+            task_loss =  [phy_loss, init_loss, bc_loss]
+            total_loss, gradnorm_loss, alphas = grad_norm(task_losses=task_loss, epoch=epoch)
+            
+            total_loss = total_loss + gradnorm_loss # Combine data loss with the total loss
             # Backpropagation
-            loss.backward(retain_graph=True)  # Backpropagate the gradients
+            total_loss.backward(retain_graph=True)  # Backpropagate the gradients
+            # gradnorm_loss.backward()  # Backpropagate GradNorm loss
 
             def closure():
                 optimizer.zero_grad()
@@ -166,11 +162,12 @@ def training_loop(epochs, model, \
                 # Calculate individual losses
                 phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
 
-                # Define weights for the different losses
-                w0, w1, w2, w3 = 1, 1, 100, 100
-                # Calculate total loss
-                loss = w1 * phy_loss + w2 * init_loss + w3 * bc_loss
-                loss.backward(retain_graph=True)
+                task_loss =  [phy_loss, init_loss, bc_loss]
+                total_loss, gradnorm_loss, alphas = grad_norm(task_losses=task_loss, epoch=epoch)
+                # Backpropagation
+                loss = total_loss + gradnorm_loss  # Combine losses
+                loss.backward(retain_graph=True)  # Backpropagate the gradients
+                # gradnorm_loss.backward()  # Backpropagate GradNorm loss
                 return loss
             
             if optimizer.__class__ == torch.optim.Adam:
@@ -179,7 +176,7 @@ def training_loop(epochs, model, \
                 optimizer.step(closure)
              
             # Accumulate losses for tracking
-            train_loss += loss.item()
+            train_loss += total_loss.item()
             
             data_loss_b += data_loss.item()
             phy_loss_acc += phy_loss.item()
@@ -239,18 +236,11 @@ def training_loop(epochs, model, \
             
             phy_loss_t = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)
             
-            w0, w1, w2, w3 = 1,1,1,1
-            # loss_t =  data_loss_t 
             
-            if epoch !=0 and epoch % 100 == 0:
-               w0 = data_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               w1 = pde_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               w2 = ic_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               w3 = bc_losses[-1]/ (data_losses[-1] + pde_losses[-1] + ic_losses[-1] + bc_losses[-1])
-               print(f"w0: {w0}, w1: {w1}, w2: {w2}, w3: {w3}")
-            loss_t = w1 * phy_loss_t + w2 * init_loss_t + w3 * bc_loss_t
-
-            test_loss += loss_t.item()
+            task_loss =  [phy_loss, init_loss, bc_loss]
+            # total_loss, gradnorm_loss, alphas = grad_norm(task_losses=task_loss, epoch=epoch)
+            total_loss =  phy_loss_t + init_loss_t + bc_loss_t
+            test_loss += total_loss.item()
             data_loss_t += data_loss_t.item()
             phy_loss_t += phy_loss_t.item()
             ic_loss_t += init_loss_t.item()
