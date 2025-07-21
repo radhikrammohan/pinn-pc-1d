@@ -24,12 +24,12 @@ from torch.optim import Adam, LBFGS
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-training_data_dir = os.path.join(current_dir, '../training_data')
-model_dir = os.path.join(current_dir, '../')
+training_data_dir = os.path.join(current_dir, '../../training_data')
+model_dir = os.path.join(current_dir, '../../')
 sys.path.insert(0,str(training_data_dir))
 sys.path.insert(0,str(model_dir))
 
-from simdata_mush_dirc import  *
+from simdata_mush_dirc_icc import  *
 from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
 from Model.train_testloop_wbal import *
 

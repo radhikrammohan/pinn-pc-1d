@@ -128,7 +128,7 @@ def training_loop(epochs, model, \
             phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
 
             # Define weights for the different losses
-            w0, w1, w2, w3 = 1, 1, 100, 100
+            w0, w1, w2, w3 = 1, 1, 1, 1
             # Calculate total loss
             # loss = data_loss 
             loss =  w1 * phy_loss + w2 * init_loss + w3 * bc_loss
@@ -157,7 +157,7 @@ def training_loop(epochs, model, \
                 phy_loss = pde_loss(model, inputs_pde[:, 0].unsqueeze(1), inputs_pde[:, 1].unsqueeze(1), T_st, T_lt)  # PDE loss
 
                 # Define weights for the different losses
-                w0, w1, w2, w3 = 1, 1, 100, 100
+                w0, w1, w2, w3 = 1, 1, 1, 1
                 # Calculate total loss
                 loss = w1 * phy_loss + w2 * init_loss + w3 * bc_loss
                 loss.backward(retain_graph=True)

@@ -1,0 +1,103 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"python"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "python"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+20002=20002. 
+  warnings.warn(
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+16002=16002. 
+  warnings.warn(
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+4002=4002. 
+  warnings.warn(
+[I 2025-07-17 16:48:55,191] A new study created in memory with name: PINN Hyperparameter Tuning
+[W 2025-07-17 16:48:55,347] Trial 0 failed with parameters: {'hidden_size': 15, 'learning_rate': 3.8159364477983234e-05, 'hidden_layers': 1, 'batch_size': 305} because of the following error: RuntimeError('Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility').
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn/spartan/jobs/../model_hypopt.py", line 447, in objective
+    u_pred_d = model(inputs[:, 0].unsqueeze(1), inputs[:, 1].unsqueeze(1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn/spartan/../Model/model.py", line 40, in forward
+    m = self.base(input_features)  # Pass the concatenated input through the network
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
+[W 2025-07-17 16:48:55,350] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn/spartan/jobs/../model_hypopt.py", line 586, in <module>
+    study.optimize(objective, n_trials=10, timeout=3600)  # 30 trials or 1 hour
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/optuna/study/study.py", line 489, in optimize
+    _optimize(
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/optuna/study/_optimize.py", line 64, in _optimize
+    _optimize_sequential(
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/optuna/study/_optimize.py", line 161, in _optimize_sequential
+    frozen_trial = _run_trial(study, func, catch)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/optuna/study/_optimize.py", line 253, in _run_trial
+    raise func_err
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn/spartan/jobs/../model_hypopt.py", line 447, in objective
+    u_pred_d = model(inputs[:, 0].unsqueeze(1), inputs[:, 1].unsqueeze(1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn/spartan/../Model/model.py", line 40, in forward
+    m = self.base(input_features)  # Pass the concatenated input through the network
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility

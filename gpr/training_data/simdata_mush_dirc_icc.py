@@ -194,6 +194,7 @@ class HT_sim():
                 else:  # Invalid temperature range
                     
                     tempfield[n] += ((self.alpha_m * self.step_coeff) * (temp_int[n+1] \
+                         - (2.0 * temp_int[n]) + temp_int[n-1]))
                     raise ValueError(f"Temperature {tempfield[n]} at index {n} is out of bounds.")
                                                                         # Update temperature
             temp_int = tempfield.copy()                                                                  # Update last time step temperature

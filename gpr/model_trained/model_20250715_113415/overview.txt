@@ -1,0 +1,5 @@
+Date and Time: 20250715_113415
+Number of Epochs: 1000
+Subset Size: 500
+MSE: 439.7732
+R²: 0.9480

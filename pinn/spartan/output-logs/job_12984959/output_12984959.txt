@@ -1,0 +1,27 @@
+Using device: cuda
+Using device: cuda
+Using device: cuda
+The spatial step is 0.0003061224489795918
+The time step is 0.000330226858600583
+0.9999180924377908
+scaling not initiated
+The number of points in the PDE input is 20000
+The number of points in the initial condition is 20000
+scaling not initiated
+The number of points in the left boundary condition is 20000
+The number of points in the right boundary condition is 20000
+scaling not initiated
+The number of points in the left boundary condition is 20000
+The number of points in the right boundary condition is 20000
+scaling not initiated
+scaling not initiated
+The number of points in the PDE input is 20000
+Using device: cuda
+{'T_st': tensor(0.8567, device='cuda:0'), 'T_lt': tensor(0.9469, device='cuda:0'), 't_surrt': tensor(0., device='cuda:0'), 'temp_init_t': tensor(1., device='cuda:0'), 'die_temp_l': 0.8405797101449275, 'die_temp_r': 0.8405797101449275}
+Best trial:
+  Value:  0.00032169807925630284
+  Params: 
+    hidden_size: 17
+    learning_rate: 0.0034107932696891205
+    hidden_layers: 1
+    batch_size: 207

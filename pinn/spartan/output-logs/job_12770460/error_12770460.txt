@@ -1,0 +1,16 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"python"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "python"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Traceback (most recent call last):
+  File "/data/gpfs/projects/punim2143/pinn-pc-1d/pinn/spartan/jobs/../job_models/model_train_wbal.py", line 32, in <module>
+    from simdata_mush_dirc import  *
+ModuleNotFoundError: No module named 'simdata_mush_dirc'

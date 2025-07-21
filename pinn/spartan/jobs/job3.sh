@@ -8,7 +8,7 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu:1
-#SBATCH --account=OD-217410
+#SBATCH --partition=gpu-a100
 
 # Define the timestamp format
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
@@ -16,7 +16,7 @@ TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
 module load python
 source ../../../pinn-1d/bin/activate
 
-
-python ../job_models/model_train_norm3.py --job_id $SLURM_JOB_ID 
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+python ../model_train_sal.py --job_id $SLURM_JOB_ID 
 
 

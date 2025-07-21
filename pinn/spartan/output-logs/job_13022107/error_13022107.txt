@@ -1,0 +1,22 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"python"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "python"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+20002=20002. 
+  warnings.warn(
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+16002=16002. 
+  warnings.warn(
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/skopt/sampler/sobol.py:521: UserWarning: The balance properties of Sobol' points require n to be a power of 2. 0 points have been previously generated, then: n=0+4002=4002. 
+  warnings.warn(
+[I 2025-07-18 11:01:27,503] A new study created in memory with name: PINN Hyperparameter Tuning
+/data/gpfs/projects/punim2143/pinn-pc-1d/pinn-1d/lib/python3.11/site-packages/torch/autograd/graph.py:823: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:180.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[I 2025-07-18 12:12:30,449] Trial 0 finished with value: 0.0010017965828878022 and parameters: {'hidden_size': 10, 'learning_rate': 2.4247833829925794e-05, 'hidden_layers': 1, 'batch_size': 94}. Best is trial 0 with value: 0.0010017965828878022.

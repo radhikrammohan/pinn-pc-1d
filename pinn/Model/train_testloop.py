@@ -12,17 +12,17 @@ import random
 import time
 import csv
 
-logger = setup_logger('train_test_loop', '../logs/train_test_loop.csv')
+# logger = setup_logger('train_test_loop', '../logs/train_test_loop.csv')
 
-with open('logs/train_test_loop.csv', 'w', newline='') as f:
-    writer = csv.writer(f)
-    # Write the header row
-    writer.writerow(['epoch', 'train_loss', 'test_loss', 'data_loss', 'pde_loss', 'ic_loss', 'bc_loss',
-                     'data_loss_test', 'pde_loss_test', 'ic_loss_test', 'bc_loss_test'])
+# with open('logs/train_test_loop.csv', 'w', newline='') as f:
+#     writer = csv.writer(f)
+#     # Write the header row
+#     writer.writerow(['epoch', 'train_loss', 'test_loss', 'data_loss', 'pde_loss', 'ic_loss', 'bc_loss',
+#                      'data_loss_test', 'pde_loss_test', 'ic_loss_test', 'bc_loss_test'])
 
-with open('logs/residual.csv', 'w', newline='') as f:
-    writer = csv.DictWriter(f, fieldnames=['epoch', 'residual', 'u_pred', 'u_t', 'u_xx', 'alpha', 'Ste'])
-    writer.writeheader()
+# with open('logs/residual.csv', 'w', newline='') as f:
+#     writer = csv.DictWriter(f, fieldnames=['epoch', 'residual', 'u_pred', 'u_t', 'u_xx', 'alpha', 'Ste'])
+#     writer.writeheader()
 
 # check for gpu
 if torch.backends.mps.is_available():

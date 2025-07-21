@@ -29,7 +29,7 @@ model_dir = os.path.join(current_dir, '../')
 sys.path.insert(0,str(training_data_dir))
 sys.path.insert(0,str(model_dir))
 
-from simdata_mush_dirc import  *
+from simdata_mush_dirc_icc import  *
 from Model.loss_func_sol_norm import loss_fn_data,pde_loss,ic_loss,boundary_loss
 from Model.train_testloop_wbal import *
 
@@ -52,7 +52,7 @@ def set_seed(seed):
 
 set_seed(1234)
 
-settings_path_1 = os.path.join(current_dir, '..', 'training_data', 'settings.json')
+settings_path_1 = os.path.join(current_dir, '..', 'training_data', 'settings2.json')
 with open(settings_path_1,'r') as file:
     settings = json.load(file)
 
@@ -66,7 +66,7 @@ dt = heat_data.dt
 dx = heat_data.dx
 # print(heat_data.dx)
 # print(dt)
-settings_path = os.path.join(current_dir, '..', 'training_data', 'settings.json')
+settings_path = os.path.join(current_dir, '..', 'training_data', 'settings2.json')
 with open(settings_path,'r') as file:
     props = json.load(file)
     

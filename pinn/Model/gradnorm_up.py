@@ -68,11 +68,14 @@ class GradNormLoss(nn.Module):
             gradnorm_loss = nn.functional.l1_loss(grad_norms, target_grad_norms, reduction='sum')
 
             # --- Damped update to smoothen weight changes ---
-            with torch.no_grad():
-                # Get gradient of gradnorm loss w.r.t. log_alphas
-                grad = torch.autograd.grad(gradnorm_loss, self.log_alphas, retain_graph=True)[0]
-                self.log_alphas.data = self.log_alphas.data - self.damping * grad
+            self.zero_grad(set_to_none=True)  # Clear existing grads
+            gradnorm_loss.backward(retain_graph=True)  # Compute gradient w.r.t. log_alphas
 
+            if self.log_alphas.grad is not None:
+                with torch.no_grad():
+                    self.log_alphas -= self.damping * self.log_alphas.grad
+                self.log_alphas.grad = None  # Reset manually
+    
         return total_loss, gradnorm_loss, alphas.detach()
 
     def get_alphas(self):
