@@ -34,10 +34,13 @@ This is **not a benchmark-chasing repo** — it is an engineering evaluation.
 
 We solve the transient 1D heat equation:
 
-\[
-\frac{\partial T}{\partial t} = \alpha \frac{\partial^2 T}{\partial x^2}
-\]
+The governing physics is the 1D transient heat equation:
 
+dT/dt = α · d²T/dx²
+
+where:
+- T(x,t) is temperature
+- α is thermal diffusivity
 with extensions relevant to **phase-change-driven solidification**.  
 Physics constraints are enforced directly in the loss function.
 
